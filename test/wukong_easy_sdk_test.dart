@@ -48,16 +48,13 @@ void main() {
     });
 
     test('Event listener management works', () {
-      bool connectCalled = false;
-      bool messageCalled = false;
-
       // Add listeners
       void connectListener(ConnectResult result) {
-        connectCalled = true;
+        // Test listener function
       }
 
       void messageListener(Message message) {
-        messageCalled = true;
+        // Test listener function
       }
 
       sdk.addEventListener(WuKongEvent.connect, connectListener);

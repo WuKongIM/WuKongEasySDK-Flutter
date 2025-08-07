@@ -1,5 +1,4 @@
 import '../enums/wukong_device_flag.dart';
-import '../utils/wukong_constants.dart';
 
 /// Configuration class for WuKong SDK
 /// 
