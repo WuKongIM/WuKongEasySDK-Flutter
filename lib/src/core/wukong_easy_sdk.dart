@@ -10,60 +10,59 @@ import 'wukong_client.dart';
 import 'wukong_config.dart';
 
 /// WuKong Easy SDK
-/// 
+///
 /// A lightweight Flutter SDK for WuKongIM that enables real-time chat functionality.
 /// This is the main entry point for the SDK.
 class WuKongEasySDK {
   /// Singleton instance
   static WuKongEasySDK? _instance;
-  
+
   /// Event manager
   late final EventManager _eventManager;
-  
+
   /// WebSocket client
   WuKongClient? _client;
-  
+
   /// Configuration
   WuKongConfig? _config;
-  
+
   /// Whether the SDK has been initialized
   bool _isInitialized = false;
-  
+
   /// Private constructor for singleton pattern
   WuKongEasySDK._() {
     _eventManager = EventManager();
   }
-  
+
   /// Gets the singleton instance of the SDK
   static WuKongEasySDK getInstance() {
     _instance ??= WuKongEasySDK._();
     return _instance!;
   }
-  
+
   /// Initializes the SDK with the provided configuration
-  /// 
+  ///
   /// [config] The configuration for the SDK
-  /// 
+  ///
   /// Throws [WuKongConfigurationException] if the configuration is invalid
   Future<void> init(WuKongConfig config) async {
     try {
       developer.log('Initializing WuKong SDK...');
-      
+
       // Validate configuration
       config.validate();
-      
+
       // Store configuration
       _config = config;
-      
+
       // Dispose existing client if any
       _client?.dispose();
-      
+
       // Create new client
       _client = WuKongClient(config, _eventManager);
-      
+
       _isInitialized = true;
       developer.log('WuKong SDK initialized successfully');
-      
     } catch (error) {
       developer.log('Failed to initialize SDK: $error');
       if (error is ArgumentError) {
@@ -72,19 +71,20 @@ class WuKongEasySDK {
       rethrow;
     }
   }
-  
+
   /// Connects to the WuKong server
-  /// 
+  ///
   /// Returns a Future that completes when the connection is established and authenticated
-  /// 
+  ///
   /// Throws [WuKongConfigurationException] if the SDK is not initialized
   /// Throws [WuKongConnectionTimeoutException] if the connection times out
   /// Throws [WuKongAuthenticationException] if authentication fails
   Future<void> connect() async {
     if (!_isInitialized || _client == null) {
-      throw const WuKongConfigurationException('SDK not initialized. Call init() first.');
+      throw const WuKongConfigurationException(
+          'SDK not initialized. Call init() first.');
     }
-    
+
     try {
       developer.log('Connecting to WuKong server...');
       await _client!.connect();
@@ -94,7 +94,7 @@ class WuKongEasySDK {
       rethrow;
     }
   }
-  
+
   /// Disconnects from the WuKong server
   void disconnect() {
     if (_client != null) {
@@ -129,7 +129,8 @@ class WuKongEasySDK {
     dynamic setting,
   }) async {
     if (!_isInitialized || _client == null) {
-      throw const WuKongConfigurationException('SDK not initialized. Call init() first.');
+      throw const WuKongConfigurationException(
+          'SDK not initialized. Call init() first.');
     }
 
     if (!_client!.isConnected) {
@@ -151,7 +152,6 @@ class WuKongEasySDK {
 
       developer.log('Message sent successfully: ${result.messageId}');
       return result;
-
     } catch (error) {
       developer.log('Failed to send message: $error');
       rethrow;
@@ -185,7 +185,8 @@ class WuKongEasySDK {
   /// ```dart
   /// bool removed = easySDK.removeEventListener(WuKongEvent.connect, connectListener);
   /// ```
-  bool removeEventListener<T>(WuKongEvent event, WuKongEventListener<T> listener) {
+  bool removeEventListener<T>(
+      WuKongEvent event, WuKongEventListener<T> listener) {
     final removed = _eventManager.removeEventListener(event, listener);
     if (removed) {
       developer.log('Removed event listener for $event');

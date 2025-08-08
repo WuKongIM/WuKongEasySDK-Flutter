@@ -27,13 +27,21 @@ This directory contains comprehensive documentation for publishing, maintaining,
 | [Distribution Checklist](distribution-checklist.md) | Comprehensive pre-release validation checklist | English |
 | [分发检查清单](distribution-checklist-zh.md) | 全面的预发布验证检查清单 | 中文 |
 
+### Automation and CI/CD
+
+| Document | Description | Language |
+|----------|-------------|----------|
+| [GitHub Actions Setup](github-actions-setup.md) | Automated publication workflow configuration | English |
+| [GitHub Actions 设置](github-actions-setup-zh.md) | 自动化发布工作流配置 | 中文 |
+
 ## 🚀 Quick Start for Maintainers
 
 ### First-Time Setup
 
 1. **Read the Publishing Guide**: Start with [publishing.md](publishing.md) for initial setup
 2. **Understand the Release Process**: Review [release-process.md](release-process.md) for workflow
-3. **Set up Maintenance Procedures**: Follow [maintenance.md](maintenance.md) for ongoing tasks
+3. **Set up Automation**: Configure [GitHub Actions](github-actions-setup.md) for automated publishing
+4. **Set up Maintenance Procedures**: Follow [maintenance.md](maintenance.md) for ongoing tasks
 
 ### Before Each Release
 

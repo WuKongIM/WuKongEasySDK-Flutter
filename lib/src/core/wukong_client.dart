@@ -20,54 +20,54 @@ import 'event_manager.dart';
 import 'wukong_config.dart';
 
 /// WebSocket client for WuKong communication
-/// 
+///
 /// Handles WebSocket connection, JSON-RPC protocol, ping/pong heartbeat, and reconnection logic.
 class WuKongClient {
   /// WebSocket channel
   WebSocketChannel? _channel;
-  
+
   /// Configuration
   final WuKongConfig _config;
-  
+
   /// Event manager
   final EventManager _eventManager;
-  
+
   /// Whether the client is connected
   bool _isConnected = false;
-  
+
   /// Whether the client is connecting
   bool _isConnecting = false;
-  
+
   /// Whether manual disconnect was initiated
   bool _manualDisconnect = false;
-  
+
   /// Whether reconnection is in progress
   bool _isReconnecting = false;
-  
+
   /// Current reconnection attempt count
   int _reconnectAttempts = 0;
-  
+
   /// Pending requests waiting for responses
   final Map<String, PendingRequest> _pendingRequests = {};
-  
+
   /// Ping timer
   Timer? _pingTimer;
-  
+
   /// Connection completer
   Completer<void>? _connectionCompleter;
-  
+
   /// Stream subscription for WebSocket messages
   StreamSubscription? _messageSubscription;
-  
+
   /// Creates a new WuKong client
   WuKongClient(this._config, this._eventManager);
-  
+
   /// Whether the client is connected
   bool get isConnected => _isConnected;
-  
+
   /// Whether the client is connecting
   bool get isConnecting => _isConnecting;
-  
+
   /// Connects to the WebSocket server
   Future<void> connect() async {
     if (_isConnected || _isConnecting) {
@@ -77,27 +77,26 @@ class WuKongClient {
       }
       return;
     }
-    
+
     _manualDisconnect = false;
     _isConnecting = true;
     _connectionCompleter = Completer<void>();
-    
+
     try {
       developer.log('Connecting to ${_config.serverUrl}...');
-      
+
       // Create WebSocket connection
       _channel = WebSocketChannel.connect(Uri.parse(_config.serverUrl));
-      
+
       // Listen for messages
       _messageSubscription = _channel!.stream.listen(
         _handleMessage,
         onError: _handleError,
         onDone: _handleDisconnect,
       );
-      
+
       // Send authentication request
       await _sendConnectRequest();
-      
     } catch (error) {
       developer.log('Failed to connect: $error');
       _isConnecting = false;
@@ -106,10 +105,10 @@ class WuKongClient {
       _cleanup();
       rethrow;
     }
-    
+
     return _connectionCompleter!.future;
   }
-  
+
   /// Disconnects from the WebSocket server
   void disconnect() {
     developer.log('Manual disconnect initiated');
@@ -117,7 +116,7 @@ class WuKongClient {
     _isReconnecting = false;
     _handleDisconnect();
   }
-  
+
   /// Sends a message
   Future<SendResult> send({
     required String channelId,
@@ -131,17 +130,17 @@ class WuKongClient {
     if (!_isConnected) {
       throw const WuKongNotConnectedException();
     }
-    
+
     if (payload == null) {
       throw const WuKongConfigurationException('Payload cannot be null');
     }
-    
+
     // Set default header values
     final messageHeader = <String, dynamic>{
       'redDot': true,
       ...?header,
     };
-    
+
     final params = {
       'clientMsgNo': clientMsgNo ?? UuidGenerator.generate(),
       'channelId': channelId,
@@ -151,37 +150,39 @@ class WuKongClient {
       if (topic != null) 'topic': topic,
       if (setting != null) 'setting': setting,
     };
-    
+
     final response = await _sendRequest('send', params);
     return SendResult.fromJson(response);
   }
-  
+
   /// Sends a JSON-RPC request and waits for response
-  Future<dynamic> _sendRequest(String method, dynamic params, [int? timeoutMs]) async {
+  Future<dynamic> _sendRequest(String method, dynamic params,
+      [int? timeoutMs]) async {
     if (_channel == null) {
       throw const WuKongNotConnectedException();
     }
-    
+
     final requestId = UuidGenerator.generate();
     final request = JsonRpcRequest(
       method: method,
       params: params,
       id: requestId,
     );
-    
+
     final completer = Completer<dynamic>();
     final timeout = timeoutMs ?? WuKongConstants.defaultRequestTimeoutMs;
-    
+
     // Set up timeout
     final timer = Timer(Duration(milliseconds: timeout), () {
       _pendingRequests.remove(requestId);
       if (!completer.isCompleted) {
         completer.completeError(
-          WuKongConnectionTimeoutException('Request timeout for method $method'),
+          WuKongConnectionTimeoutException(
+              'Request timeout for method $method'),
         );
       }
     });
-    
+
     _pendingRequests[requestId] = PendingRequest(
       resolve: (result) {
         timer.cancel();
@@ -197,7 +198,7 @@ class WuKongClient {
       },
       timeoutTimer: timer,
     );
-    
+
     try {
       final message = jsonEncode(request.toJson());
       developer.log('--> Sending request: $message');
@@ -207,10 +208,10 @@ class WuKongClient {
       _pendingRequests.remove(requestId);
       rethrow;
     }
-    
+
     return completer.future;
   }
-  
+
   /// Sends a JSON-RPC notification (no response expected)
   void _sendNotification(String method, dynamic params) {
     if (_channel == null) {
@@ -236,7 +237,8 @@ class WuKongClient {
   Future<void> _sendConnectRequest() async {
     try {
       final params = _config.toAuthParams();
-      final result = await _sendRequest('connect', params, WuKongConstants.connectTimeoutMs);
+      final result = await _sendRequest(
+          'connect', params, WuKongConstants.connectTimeoutMs);
 
       final connectResult = ConnectResult.fromJson(result);
       developer.log('Authentication successful: $connectResult');
@@ -250,7 +252,6 @@ class WuKongClient {
       _eventManager.emit(WuKongEvent.connect, connectResult);
       _connectionCompleter?.complete();
       _connectionCompleter = null;
-
     } catch (error) {
       developer.log('Authentication failed: $error');
       _isConnecting = false;
@@ -284,9 +285,11 @@ class WuKongClient {
       }
     } catch (error) {
       developer.log('Error parsing message: $error');
-      _eventManager.emit(WuKongEvent.error, WuKongError.fromException(
-        Exception('Failed to parse message: $error'),
-      ));
+      _eventManager.emit(
+          WuKongEvent.error,
+          WuKongError.fromException(
+            Exception('Failed to parse message: $error'),
+          ));
     }
   }
 
@@ -297,7 +300,8 @@ class WuKongClient {
     final pending = _pendingRequests.remove(response.id);
     if (pending != null) {
       if (response.isError) {
-        final error = WuKongProtocolException('Server error: ${response.error!.message}');
+        final error =
+            WuKongProtocolException('Server error: ${response.error!.message}');
         pending.reject(error);
       } else {
         pending.resolve(response.result);
@@ -333,7 +337,8 @@ class WuKongClient {
       _eventManager.emit(WuKongEvent.message, message);
 
       // Send acknowledgment
-      _sendRecvAck(message.header.toJson(), message.messageId, message.messageSeq);
+      _sendRecvAck(
+          message.header.toJson(), message.messageId, message.messageSeq);
     } catch (error) {
       developer.log('Error handling recv notification: $error');
     }
@@ -347,13 +352,15 @@ class WuKongClient {
   /// Handles server-initiated disconnect
   void _handleServerDisconnect(dynamic params) {
     developer.log('Server initiated disconnect: $params');
-    final disconnectInfo = DisconnectInfo.fromJson(params as Map<String, dynamic>? ?? {});
+    final disconnectInfo =
+        DisconnectInfo.fromJson(params as Map<String, dynamic>? ?? {});
     _eventManager.emit(WuKongEvent.disconnect, disconnectInfo);
     _handleDisconnect();
   }
 
   /// Sends message acknowledgment
-  void _sendRecvAck(Map<String, dynamic> header, String messageId, int messageSeq) {
+  void _sendRecvAck(
+      Map<String, dynamic> header, String messageId, int messageSeq) {
     final params = {
       'header': header,
       'messageId': messageId,
@@ -377,7 +384,8 @@ class WuKongClient {
       },
     );
 
-    developer.log('Ping timer started (${WuKongConstants.pingIntervalMs}ms interval)');
+    developer.log(
+        'Ping timer started (${WuKongConstants.pingIntervalMs}ms interval)');
   }
 
   /// Stops the ping timer
@@ -390,9 +398,11 @@ class WuKongClient {
   /// Sends a ping request
   void _sendPing() {
     try {
-      _sendRequest('ping', {}, WuKongConstants.pongTimeoutMs).catchError((error) {
+      _sendRequest('ping', {}, WuKongConstants.pongTimeoutMs)
+          .catchError((error) {
         developer.log('Ping failed: $error');
-        _eventManager.emit(WuKongEvent.error, WuKongError.timeoutError('Ping timeout'));
+        _eventManager.emit(
+            WuKongEvent.error, WuKongError.timeoutError('Ping timeout'));
         _tryReconnect();
       });
     } catch (error) {
@@ -443,14 +453,17 @@ class WuKongClient {
       developer.log('Max reconnect attempts reached. Giving up.');
       _isReconnecting = false;
       _reconnectAttempts = 0;
-      _eventManager.emit(WuKongEvent.error, WuKongError.networkError('Reconnection failed'));
+      _eventManager.emit(
+          WuKongEvent.error, WuKongError.networkError('Reconnection failed'));
       return;
     }
 
-    final delay = WuKongConstants.initialReconnectDelayMs * pow(2, _reconnectAttempts);
+    final delay =
+        WuKongConstants.initialReconnectDelayMs * pow(2, _reconnectAttempts);
     _reconnectAttempts++;
 
-    developer.log('Scheduling reconnect attempt $_reconnectAttempts in ${delay}ms');
+    developer
+        .log('Scheduling reconnect attempt $_reconnectAttempts in ${delay}ms');
 
     Timer(Duration(milliseconds: delay.toInt()), () {
       if (!_isReconnecting) {
@@ -495,7 +508,8 @@ class WuKongClient {
 
     // Complete connection completer with error if still pending
     if (_connectionCompleter != null && !_connectionCompleter!.isCompleted) {
-      _connectionCompleter!.completeError(const WuKongNetworkException('Connection closed'));
+      _connectionCompleter!
+          .completeError(const WuKongNetworkException('Connection closed'));
       _connectionCompleter = null;
     }
   }

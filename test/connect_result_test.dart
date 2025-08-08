@@ -46,10 +46,7 @@ void main() {
 
     test('should parse minimal server response', () {
       // Minimal required fields
-      final serverResponse = {
-        "timeDiff": 100,
-        "reasonCode": 1
-      };
+      final serverResponse = {"timeDiff": 100, "reasonCode": 1};
 
       final result = ConnectResult.fromJson(serverResponse);
       expect(result.timeDiff, equals(100));

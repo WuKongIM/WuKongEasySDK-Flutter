@@ -4,16 +4,16 @@ import '../enums/wukong_channel_type.dart';
 class MessageHeader {
   /// Whether the message should not be persisted
   final bool? noPersist;
-  
+
   /// Whether the message should show a red dot notification
   final bool? redDot;
-  
+
   /// Whether the message should be synced only once
   final bool? syncOnce;
-  
+
   /// Whether this is a duplicate message
   final bool? dup;
-  
+
   /// Creates a new message header
   const MessageHeader({
     this.noPersist,
@@ -21,7 +21,7 @@ class MessageHeader {
     this.syncOnce,
     this.dup,
   });
-  
+
   /// Creates a MessageHeader from JSON
   factory MessageHeader.fromJson(Map<String, dynamic> json) {
     return MessageHeader(
@@ -31,7 +31,7 @@ class MessageHeader {
       dup: json['dup'] as bool?,
     );
   }
-  
+
   /// Converts MessageHeader to JSON
   Map<String, dynamic> toJson() {
     return {
@@ -44,48 +44,48 @@ class MessageHeader {
 }
 
 /// Received message from the server
-/// 
+///
 /// Contains all information about a message received from WuKongIM.
 class Message {
   /// Message header
   final MessageHeader header;
-  
+
   /// Unique message ID
   final String messageId;
-  
+
   /// Message sequence number
   final int messageSeq;
-  
+
   /// Message timestamp
   final int timestamp;
-  
+
   /// Channel ID where the message was sent
   final String channelId;
-  
+
   /// Type of channel
   final WuKongChannelType channelType;
-  
+
   /// User ID of the sender
   final String fromUid;
-  
+
   /// Business-defined message payload
   final dynamic payload;
-  
+
   /// Optional client message number
   final String? clientMsgNo;
-  
+
   /// Optional stream number
   final String? streamNo;
-  
+
   /// Optional stream ID
   final String? streamId;
-  
+
   /// Optional stream flag
   final int? streamFlag;
-  
+
   /// Optional topic
   final String? topic;
-  
+
   /// Creates a new message
   const Message({
     required this.header,
@@ -102,7 +102,7 @@ class Message {
     this.streamFlag,
     this.topic,
   });
-  
+
   /// Creates a Message from JSON
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(
@@ -121,7 +121,7 @@ class Message {
       topic: json['topic'] as String?,
     );
   }
-  
+
   /// Converts Message to JSON
   Map<String, dynamic> toJson() {
     return {
@@ -140,10 +140,10 @@ class Message {
       if (topic != null) 'topic': topic,
     };
   }
-  
+
   /// Gets the message timestamp as DateTime
   DateTime get dateTime => DateTime.fromMillisecondsSinceEpoch(timestamp);
-  
+
   @override
   String toString() {
     return 'Message(messageId: $messageId, fromUid: $fromUid, channelId: $channelId)';

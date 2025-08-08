@@ -88,7 +88,8 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
           _isConnected = false;
           _isConnecting = false;
         });
-        _addLog('Event: Disconnected. Code: ${info.code}, Reason: ${info.reason}');
+        _addLog(
+            'Event: Disconnected. Code: ${info.code}, Reason: ${info.reason}');
       }
     };
 
@@ -157,7 +158,8 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
       _isConnecting = true;
     });
 
-    _addLog('Initializing WKIM with URL: ${_serverUrlController.text}, UID: ${_userIdController.text}');
+    _addLog(
+        'Initializing WKIM with URL: ${_serverUrlController.text}, UID: ${_userIdController.text}');
     _addLog('Attempting to connect...');
 
     try {
@@ -198,7 +200,8 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
         payload: messageJson,
       );
 
-      _addLog('Message sent successfully! MessageID: ${result.messageId}, MessageSeq: ${result.messageSeq}');
+      _addLog(
+          'Message sent successfully! MessageID: ${result.messageId}, MessageSeq: ${result.messageSeq}');
     } catch (e) {
       _addLog('Send message failed: $e');
     }
@@ -247,11 +250,14 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildInputField('Server URL:', _serverUrlController, !_isConnected && !_isConnecting),
+                  _buildInputField('Server URL:', _serverUrlController,
+                      !_isConnected && !_isConnecting),
                   const SizedBox(height: 16),
-                  _buildInputField('User ID:', _userIdController, !_isConnected && !_isConnecting),
+                  _buildInputField('User ID:', _userIdController,
+                      !_isConnected && !_isConnecting),
                   const SizedBox(height: 16),
-                  _buildInputField('Token:', _tokenController, !_isConnected && !_isConnecting),
+                  _buildInputField('Token:', _tokenController,
+                      !_isConnected && !_isConnecting),
                   const SizedBox(height: 20),
                   Row(
                     children: [
@@ -287,7 +293,8 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildInputField('Target User ID:', _targetUserIdController, _isConnected),
+                  _buildInputField(
+                      'Target User ID:', _targetUserIdController, _isConnected),
                   const SizedBox(height: 16),
                   const Text(
                     'Message (JSON):',
@@ -311,7 +318,8 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
                       maxLines: null,
                       expands: true,
                       textAlignVertical: TextAlignVertical.top,
-                      style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+                      style: const TextStyle(
+                          fontFamily: 'monospace', fontSize: 13),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.all(12),
@@ -387,7 +395,8 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
     );
   }
 
-  Widget _buildInputField(String label, TextEditingController controller, bool enabled) {
+  Widget _buildInputField(
+      String label, TextEditingController controller, bool enabled) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -422,7 +431,8 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
     );
   }
 
-  Widget _buildButton(String text, VoidCallback? onPressed, Color color, bool isLoading) {
+  Widget _buildButton(
+      String text, VoidCallback? onPressed, Color color, bool isLoading) {
     return SizedBox(
       height: 36,
       child: ElevatedButton(
@@ -447,7 +457,8 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
               )
             : Text(
                 text,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                style:
+                    const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
               ),
       ),
     );

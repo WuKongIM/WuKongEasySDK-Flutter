@@ -1,0 +1,22 @@
+name: 📦 Publish to pub.dev
+
+# Trigger conditions: version tags only (as required by pub.dev)
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'  # Matches v1.0.0, v1.2.3, v1.0.0-beta.1, etc.
+    # Note: pub.dev only allows tag-triggered GitHub Actions publishing
+
+# Use the official Dart team's reusable workflow for publishing
+# This workflow is maintained by the Dart team and follows all best practices
+jobs:
+  publish:
+    name: 🚀 Publish to pub.dev / 发布到 pub.dev
+    permissions:
+      id-token: write # Required for authentication using OIDC
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
+    # Uncomment the following if your package is in a subdirectory:
+    # with:
+    #   working-directory: path/to/package/within/repository
+
+

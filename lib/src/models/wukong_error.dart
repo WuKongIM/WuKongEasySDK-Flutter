@@ -1,25 +1,25 @@
 import '../enums/wukong_error_code.dart';
 
 /// WuKong SDK Error
-/// 
+///
 /// Represents an error that occurred in the WuKong SDK.
 class WuKongError {
   /// Error code
   final WuKongErrorCode code;
-  
+
   /// Error message
   final String message;
-  
+
   /// Additional error data
   final dynamic data;
-  
+
   /// Creates a new WuKong error
   const WuKongError({
     required this.code,
     required this.message,
     this.data,
   });
-  
+
   /// Creates a WuKongError from JSON
   factory WuKongError.fromJson(Map<String, dynamic> json) {
     return WuKongError(
@@ -28,15 +28,16 @@ class WuKongError {
       data: json['data'],
     );
   }
-  
+
   /// Creates a WuKongError from an exception
-  factory WuKongError.fromException(Exception exception, {WuKongErrorCode? code}) {
+  factory WuKongError.fromException(Exception exception,
+      {WuKongErrorCode? code}) {
     return WuKongError(
       code: code ?? WuKongErrorCode.unknown,
       message: exception.toString(),
     );
   }
-  
+
   /// Creates a network error
   factory WuKongError.networkError(String message) {
     return WuKongError(
@@ -44,7 +45,7 @@ class WuKongError {
       message: message,
     );
   }
-  
+
   /// Creates an authentication error
   factory WuKongError.authError(String message) {
     return WuKongError(
@@ -52,7 +53,7 @@ class WuKongError {
       message: message,
     );
   }
-  
+
   /// Creates a connection timeout error
   factory WuKongError.timeoutError(String message) {
     return WuKongError(
@@ -60,7 +61,7 @@ class WuKongError {
       message: message,
     );
   }
-  
+
   /// Converts WuKongError to JSON
   Map<String, dynamic> toJson() {
     return {
@@ -69,7 +70,7 @@ class WuKongError {
       if (data != null) 'data': data,
     };
   }
-  
+
   static WuKongErrorCode _parseErrorCode(dynamic code) {
     if (code is String) {
       try {
@@ -94,7 +95,7 @@ class WuKongError {
     }
     return WuKongErrorCode.unknown;
   }
-  
+
   @override
   String toString() {
     return 'WuKongError(code: $code, message: $message)';

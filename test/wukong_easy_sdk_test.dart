@@ -65,8 +65,10 @@ void main() {
       expect(sdk.getTotalListenerCount(), equals(2));
 
       // Remove listeners
-      final removed1 = sdk.removeEventListener(WuKongEvent.connect, connectListener);
-      final removed2 = sdk.removeEventListener(WuKongEvent.message, messageListener);
+      final removed1 =
+          sdk.removeEventListener(WuKongEvent.connect, connectListener);
+      final removed2 =
+          sdk.removeEventListener(WuKongEvent.message, messageListener);
 
       expect(removed1, isTrue);
       expect(removed2, isTrue);
@@ -117,14 +119,14 @@ void main() {
     });
 
     test('Exceptions work correctly', () {
-      expect(() => throw const WuKongNotConnectedException(), 
-             throwsA(isA<WuKongNotConnectedException>()));
-      
-      expect(() => throw const WuKongInvalidChannelException('test_channel'), 
-             throwsA(isA<WuKongInvalidChannelException>()));
-      
-      expect(() => throw const WuKongMessageTooLargeException(1000, 500), 
-             throwsA(isA<WuKongMessageTooLargeException>()));
+      expect(() => throw const WuKongNotConnectedException(),
+          throwsA(isA<WuKongNotConnectedException>()));
+
+      expect(() => throw const WuKongInvalidChannelException('test_channel'),
+          throwsA(isA<WuKongInvalidChannelException>()));
+
+      expect(() => throw const WuKongMessageTooLargeException(1000, 500),
+          throwsA(isA<WuKongMessageTooLargeException>()));
     });
 
     test('SDK initialization requires valid config', () async {
@@ -143,9 +145,9 @@ void main() {
         uid: 'test_user',
         token: 'test_token',
       );
-      
+
       await sdk.init(config);
-      
+
       expect(() async {
         await sdk.send(
           channelId: 'test_channel',

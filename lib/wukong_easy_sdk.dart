@@ -1,5 +1,5 @@
 /// WuKongIM Flutter EasySDK
-/// 
+///
 /// A lightweight Flutter SDK for WuKongIM that enables real-time chat functionality.
 library wukong_easy_sdk;
 

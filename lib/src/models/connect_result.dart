@@ -29,7 +29,7 @@ class ConnectResult {
     this.serverVersion,
     this.nodeId,
   });
-  
+
   /// Creates a ConnectResult from JSON
   factory ConnectResult.fromJson(Map<String, dynamic> json) {
     return ConnectResult(
@@ -41,7 +41,7 @@ class ConnectResult {
       nodeId: json['nodeId'] as int?,
     );
   }
-  
+
   /// Converts ConnectResult to JSON
   Map<String, dynamic> toJson() {
     return {
