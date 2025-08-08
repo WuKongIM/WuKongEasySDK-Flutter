@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [1.0.1] - 2025-08-08
+
+### Added
+- Add GitHub Actions workflow for automated testing and publishing
+- Add OIDC authentication for secure package publishing
+- Add documentation for automated publishing process
+- Add documentation for OIDC authentication setup
+
 ## [1.0.0] - 2025-01-06
 
 ### Added
