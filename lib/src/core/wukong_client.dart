@@ -81,6 +81,7 @@ class WuKongClient {
     _manualDisconnect = false;
     _isConnecting = true;
     _connectionCompleter = Completer<void>();
+    final future = _connectionCompleter!.future;
 
     try {
       developer.log('Connecting to ${_config.serverUrl}...');
@@ -97,16 +98,23 @@ class WuKongClient {
 
       // Send authentication request
       await _sendConnectRequest();
+
+      if (_connectionCompleter != null && !_connectionCompleter!.isCompleted) {
+        _connectionCompleter!.complete();
+      }
     } catch (error) {
       developer.log('Failed to connect: $error');
       _isConnecting = false;
-      _connectionCompleter?.completeError(error);
-      _connectionCompleter = null;
+      if (_connectionCompleter != null && !_connectionCompleter!.isCompleted) {
+        _connectionCompleter!.completeError(error);
+      }
       _cleanup();
       rethrow;
+    } finally {
+      _connectionCompleter = null;
     }
 
-    return _connectionCompleter!.future;
+    return future;
   }
 
   /// Disconnects from the WebSocket server
@@ -250,13 +258,9 @@ class WuKongClient {
 
       _startPing();
       _eventManager.emit(WuKongEvent.connect, connectResult);
-      _connectionCompleter?.complete();
-      _connectionCompleter = null;
     } catch (error) {
       developer.log('Authentication failed: $error');
       _isConnecting = false;
-      _connectionCompleter?.completeError(error);
-      _connectionCompleter = null;
 
       final wukongError = error is WuKongException
           ? WuKongError.authError(error.message)
