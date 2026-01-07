@@ -76,18 +76,25 @@ void main() {
       expect(sdk.getListenerCount(WuKongEvent.message), equals(0));
     });
 
-    test('Channel type enum works', () {
+    test('Channel type class works', () {
       expect(WuKongChannelType.person.value, equals(1));
       expect(WuKongChannelType.group.value, equals(2));
       expect(WuKongChannelType.fromValue(1), equals(WuKongChannelType.person));
       expect(WuKongChannelType.fromValue(2), equals(WuKongChannelType.group));
+
+      // Test custom channel type
+      final customType = WuKongChannelType(100);
+      expect(customType.value, equals(100));
+      expect(WuKongChannelType.fromValue(100), equals(customType));
+      expect(WuKongChannelType.fromValue(100).toString(),
+          equals('WuKongChannelType.custom(100)'));
     });
 
     test('Device flag enum works', () {
-      expect(WuKongDeviceFlag.app.value, equals(1));
-      expect(WuKongDeviceFlag.web.value, equals(2));
-      expect(WuKongDeviceFlag.fromValue(1), equals(WuKongDeviceFlag.app));
-      expect(WuKongDeviceFlag.fromValue(2), equals(WuKongDeviceFlag.web));
+      expect(WuKongDeviceFlag.app.value, equals(0));
+      expect(WuKongDeviceFlag.web.value, equals(1));
+      expect(WuKongDeviceFlag.fromValue(0), equals(WuKongDeviceFlag.app));
+      expect(WuKongDeviceFlag.fromValue(1), equals(WuKongDeviceFlag.web));
     });
 
     test('Message payload serialization works', () {

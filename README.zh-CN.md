@@ -361,6 +361,7 @@ Future<SendResult> send({
 |------|----|----- |
 | `WuKongChannelType.person` | 1 | 一对一私聊 |
 | `WuKongChannelType.group` | 2 | 群聊 |
+| `WuKongChannelType(value)` | 自定义 | 自定义频道类型 |
 
 ### 数据模型
 

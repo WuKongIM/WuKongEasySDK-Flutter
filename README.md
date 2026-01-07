@@ -361,6 +361,7 @@ Future<SendResult> send({
 |------|-------|-------------|
 | `WuKongChannelType.person` | 1 | 1-on-1 private chat |
 | `WuKongChannelType.group` | 2 | Group chat |
+| `WuKongChannelType(value)` | Custom | Custom channel type |
 
 ### Data Models
 
