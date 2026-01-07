@@ -354,6 +354,9 @@ Future<SendResult> send({
 | `WuKongEvent.disconnect` | Connection lost | `DisconnectInfo` |
 | `WuKongEvent.message` | Message received | `Message` |
 | `WuKongEvent.error` | Error occurred | `WuKongError` |
+| `WuKongEvent.sendAck` | Received message send acknowledgment | `SendResult` |
+| `WuKongEvent.reconnecting` | SDK is attempting to reconnect | `ReconnectingInfo` |
+| `WuKongEvent.customEvent` | Received custom event from server | `EventNotification` |
 
 ### Channel Types
 
@@ -396,6 +399,26 @@ class Message {
 class SendResult {
   final String messageId;       // Generated message ID
   final int messageSeq;         // Message sequence number
+  final int reasonCode;         // Reason code (see WuKongReasonCode)
+}
+```
+
+#### EventNotification
+```dart
+class EventNotification {
+  final String id;              // Unique event ID
+  final String type;            // Event type
+  final int timestamp;          // Event timestamp
+  final dynamic data;           // Event data
+  final MessageHeader? header;  // Optional message header
+}
+```
+
+#### ReconnectingInfo
+```dart
+class ReconnectingInfo {
+  final int attempt;            // Current reconnection attempt count
+  final int delay;              // Delay before next attempt (ms)
 }
 ```
 

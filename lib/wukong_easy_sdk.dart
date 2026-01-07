@@ -10,8 +10,10 @@ export 'src/core/wukong_config.dart';
 // Models
 export 'src/models/connect_result.dart';
 export 'src/models/disconnect_info.dart';
+export 'src/models/event_notification.dart';
 export 'src/models/message.dart';
 export 'src/models/message_payload.dart';
+export 'src/models/reconnecting_info.dart';
 export 'src/models/send_result.dart';
 export 'src/models/wukong_error.dart';
 
@@ -20,6 +22,7 @@ export 'src/enums/wukong_event.dart';
 export 'src/enums/wukong_channel_type.dart';
 export 'src/enums/wukong_device_flag.dart';
 export 'src/enums/wukong_error_code.dart';
+export 'src/enums/wukong_reason_code.dart';
 
 // Exceptions
 export 'src/exceptions/wukong_exceptions.dart';

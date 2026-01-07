@@ -354,6 +354,9 @@ Future<SendResult> send({
 | `WuKongEvent.disconnect` | 连接丢失 | `DisconnectInfo` |
 | `WuKongEvent.message` | 接收到消息 | `Message` |
 | `WuKongEvent.error` | 发生错误 | `WuKongError` |
+| `WuKongEvent.sendAck` | 收到消息发送确认 | `SendResult` |
+| `WuKongEvent.reconnecting` | SDK 正在尝试重连 | `ReconnectingInfo` |
+| `WuKongEvent.customEvent` | 收到服务器自定义事件 | `EventNotification` |
 
 ### 频道类型
 
@@ -396,6 +399,26 @@ class Message {
 class SendResult {
   final String messageId;       // 生成的消息 ID
   final int messageSeq;         // 消息序列号
+  final int reasonCode;         // 原因码（参考 WuKongReasonCode）
+}
+```
+
+#### EventNotification
+```dart
+class EventNotification {
+  final String id;              // 事件唯一 ID
+  final String type;            // 事件类型
+  final int timestamp;          // 事件时间戳
+  final dynamic data;           // 事件数据
+  final MessageHeader? header;  // 可选消息头
+}
+```
+
+#### ReconnectingInfo
+```dart
+class ReconnectingInfo {
+  final int attempt;            // 当前重连尝试次数
+  final int delay;              // 下一次尝试前的延迟（毫秒）
 }
 ```
 

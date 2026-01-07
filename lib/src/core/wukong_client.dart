@@ -10,7 +10,9 @@ import '../enums/wukong_channel_type.dart';
 import '../exceptions/wukong_exceptions.dart';
 import '../models/connect_result.dart';
 import '../models/disconnect_info.dart';
+import '../models/event_notification.dart';
 import '../models/message.dart';
+import '../models/reconnecting_info.dart';
 import '../models/send_result.dart';
 import '../models/wukong_error.dart';
 import '../utils/json_rpc.dart';
@@ -329,6 +331,12 @@ class WuKongClient {
       case 'disconnect':
         _handleServerDisconnect(notification.params);
         break;
+      case 'event':
+        _handleEventNotification(notification.params);
+        break;
+      case 'sendack':
+        _handleSendAckNotification(notification.params);
+        break;
       default:
         developer.log('Unknown notification method: ${notification.method}');
     }
@@ -360,6 +368,26 @@ class WuKongClient {
         DisconnectInfo.fromJson(params as Map<String, dynamic>? ?? {});
     _eventManager.emit(WuKongEvent.disconnect, disconnectInfo);
     _handleDisconnect();
+  }
+
+  /// Handles custom event notifications
+  void _handleEventNotification(dynamic params) {
+    try {
+      final event = EventNotification.fromJson(params as Map<String, dynamic>);
+      _eventManager.emit(WuKongEvent.customEvent, event);
+    } catch (error) {
+      developer.log('Error handling event notification: $error');
+    }
+  }
+
+  /// Handles send acknowledgment notifications
+  void _handleSendAckNotification(dynamic params) {
+    try {
+      final result = SendResult.fromJson(params as Map<String, dynamic>);
+      _eventManager.emit(WuKongEvent.sendAck, result);
+    } catch (error) {
+      developer.log('Error handling sendack notification: $error');
+    }
   }
 
   /// Sends message acknowledgment
@@ -468,6 +496,14 @@ class WuKongClient {
 
     developer
         .log('Scheduling reconnect attempt $_reconnectAttempts in ${delay}ms');
+
+    _eventManager.emit(
+      WuKongEvent.reconnecting,
+      ReconnectingInfo(
+        attempt: _reconnectAttempts,
+        delay: delay.toInt(),
+      ),
+    );
 
     Timer(Duration(milliseconds: delay.toInt()), () {
       if (!_isReconnecting) {

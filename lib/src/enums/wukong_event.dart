@@ -13,4 +13,13 @@ enum WuKongEvent {
 
   /// An error occurred (WebSocket error, connection error, etc.)
   error,
+
+  /// Received acknowledgment for a sent message
+  sendAck,
+
+  /// The SDK is attempting to reconnect
+  reconnecting,
+
+  /// Received a custom event notification from the server
+  customEvent,
 }

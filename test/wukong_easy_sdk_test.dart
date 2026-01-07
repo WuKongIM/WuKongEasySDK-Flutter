@@ -59,10 +59,16 @@ void main() {
 
       sdk.addEventListener(WuKongEvent.connect, connectListener);
       sdk.addEventListener(WuKongEvent.message, messageListener);
+      sdk.addEventListener(WuKongEvent.sendAck, (result) {});
+      sdk.addEventListener(WuKongEvent.reconnecting, (info) {});
+      sdk.addEventListener(WuKongEvent.customEvent, (event) {});
 
       expect(sdk.getListenerCount(WuKongEvent.connect), equals(1));
       expect(sdk.getListenerCount(WuKongEvent.message), equals(1));
-      expect(sdk.getTotalListenerCount(), equals(2));
+      expect(sdk.getListenerCount(WuKongEvent.sendAck), equals(1));
+      expect(sdk.getListenerCount(WuKongEvent.reconnecting), equals(1));
+      expect(sdk.getListenerCount(WuKongEvent.customEvent), equals(1));
+      expect(sdk.getTotalListenerCount(), equals(5));
 
       // Remove listeners
       final removed1 =
@@ -95,6 +101,39 @@ void main() {
       expect(WuKongDeviceFlag.web.value, equals(1));
       expect(WuKongDeviceFlag.fromValue(0), equals(WuKongDeviceFlag.app));
       expect(WuKongDeviceFlag.fromValue(1), equals(WuKongDeviceFlag.web));
+    });
+
+    test('Reason code enum works', () {
+      expect(WuKongReasonCode.success.value, equals(1));
+      expect(WuKongReasonCode.authFail.value, equals(2));
+      expect(WuKongReasonCode.fromValue(1), equals(WuKongReasonCode.success));
+      expect(WuKongReasonCode.fromValue(2), equals(WuKongReasonCode.authFail));
+      expect(WuKongReasonCode.fromValue(99), equals(WuKongReasonCode.unknown));
+    });
+
+    test('Event notification model works', () {
+      final notification = EventNotification(
+        id: 'evt_123',
+        type: 'test_event',
+        timestamp: 123456789,
+        data: {'key': 'value'},
+      );
+
+      expect(notification.id, equals('evt_123'));
+      expect(notification.type, equals('test_event'));
+      expect(notification.data['key'], equals('value'));
+
+      final json = notification.toJson();
+      final fromJson = EventNotification.fromJson(json);
+      expect(fromJson.id, equals(notification.id));
+      expect(fromJson.type, equals(notification.type));
+    });
+
+    test('Reconnecting info model works', () {
+      const info = ReconnectingInfo(attempt: 1, delay: 1000);
+      expect(info.attempt, equals(1));
+      expect(info.delay, equals(1000));
+      expect(info.toString(), contains('attempt: 1'));
     });
 
     test('Message payload serialization works', () {
