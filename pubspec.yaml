@@ -1,6 +1,6 @@
 name: wukong_easy_sdk
 description: A lightweight Flutter SDK for WuKongIM that enables real-time chat functionality in 5 minutes.
-version: 1.0.2
+version: 1.0.3
 homepage: https://github.com/WuKongIM/WuKongEasySDK-Flutter
 
 environment:
