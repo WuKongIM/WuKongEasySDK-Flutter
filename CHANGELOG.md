@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.0.3] - 2026-03-22
+
+### Added
+- Support custom event listeners via `customEvent`
+- `WuKongChannelType` support `custom` type
+
+### Fixed
+- Fix send message failed with `cannot unmarshal object into Go struct field SendParams.payload of type []uint8` by base64 encoding payload
+
+### Changed
+- Add `reasonCode` field to `SendResult` for send operation results
+- Refactor `WuKongReasonCode` from enum to class with constants to preserve unknown server values
+- Update example iOS configuration for newer Flutter
+
 ## [1.0.2] - 2026-01-06
 
 ### Fixed
