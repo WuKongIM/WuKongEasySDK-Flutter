@@ -151,11 +151,15 @@ class WuKongClient {
       ...?header,
     };
 
+    // Encode payload to base64: server expects []uint8 (base64 string in JSON)
+    final payloadBytes = utf8.encode(jsonEncode(payload));
+    final payloadBase64 = base64Encode(payloadBytes);
+
     final params = {
       'clientMsgNo': clientMsgNo ?? UuidGenerator.generate(),
       'channelId': channelId,
       'channelType': channelType.value,
-      'payload': payload,
+      'payload': payloadBase64,
       'header': messageHeader,
       if (topic != null) 'topic': topic,
       if (setting != null) 'setting': setting,
