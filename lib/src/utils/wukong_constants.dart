@@ -22,9 +22,6 @@ class WuKongConstants {
   /// Initial reconnection delay in milliseconds
   static const int initialReconnectDelayMs = 1000;
 
-  /// Default device flag for Flutter apps
-  static const int defaultDeviceFlag = 1; // APP
-
   /// JSON-RPC version
   static const String jsonRpcVersion = '2.0';
 }
