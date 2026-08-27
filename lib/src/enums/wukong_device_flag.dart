@@ -2,13 +2,13 @@
 ///
 /// Defines the different device types for WuKongIM authentication.
 enum WuKongDeviceFlag {
-  /// Mobile app device
+  /// APP client (WuKongIM protocol value: 0)
   app(0),
 
-  /// Web browser device
+  /// Web client (WuKongIM protocol value: 1)
   web(1),
 
-  /// pc device
+  /// PC / desktop client (WuKongIM protocol value: 2)
   pc(2);
 
   const WuKongDeviceFlag(this.value);

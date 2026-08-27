@@ -56,7 +56,7 @@ final config = WuKongConfig(
   uid: "user123",                                   // 唯一用户标识符
   token: "your_auth_token",                         // 身份验证令牌
   deviceId: "device_001",                           // 可选：设备标识符
-  deviceFlag: WuKongDeviceFlag.app,                 // 可选：设备类型（app/web）
+  deviceFlag: WuKongDeviceFlag.app,                 // 可选：设备类型（app/web/pc）
 );
 
 // 获取 SDK 实例并初始化

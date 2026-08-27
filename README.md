@@ -56,7 +56,7 @@ final config = WuKongConfig(
   uid: "user123",                                   // Unique user identifier
   token: "your_auth_token",                         // Authentication token
   deviceId: "device_001",                           // Optional: Device identifier
-  deviceFlag: WuKongDeviceFlag.app,                 // Optional: Device type (app/web)
+  deviceFlag: WuKongDeviceFlag.app,                 // Optional: Device type (app/web/pc)
 );
 
 // Get SDK instance and initialize

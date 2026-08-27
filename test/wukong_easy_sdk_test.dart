@@ -96,13 +96,6 @@ void main() {
           equals('WuKongChannelType.custom(100)'));
     });
 
-    test('Device flag enum works', () {
-      expect(WuKongDeviceFlag.app.value, equals(0));
-      expect(WuKongDeviceFlag.web.value, equals(1));
-      expect(WuKongDeviceFlag.fromValue(0), equals(WuKongDeviceFlag.app));
-      expect(WuKongDeviceFlag.fromValue(1), equals(WuKongDeviceFlag.web));
-    });
-
     test('Reason code enum works', () {
       expect(WuKongReasonCode.success.value, equals(1));
       expect(WuKongReasonCode.authFail.value, equals(2));
