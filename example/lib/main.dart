@@ -46,8 +46,7 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
   final TextEditingController _serverUrlController = TextEditingController();
   final TextEditingController _userIdController = TextEditingController();
   final TextEditingController _tokenController = TextEditingController();
-  final TextEditingController _targetUserIdController =
-      TextEditingController();
+  final TextEditingController _targetUserIdController = TextEditingController();
   final TextEditingController _messageJsonController = TextEditingController();
 
   // State variables
@@ -410,7 +409,7 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(13),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -488,9 +487,9 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withAlpha(26),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.5)),
+        border: Border.all(color: color.withAlpha(128)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -625,9 +624,9 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
+        color: color.withAlpha(13),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.1)),
+        border: Border.all(color: color.withAlpha(26)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

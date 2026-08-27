@@ -96,12 +96,12 @@ void main() {
           equals('WuKongChannelType.custom(100)'));
     });
 
-    test('Reason code enum works', () {
+    test('Reason codes preserve arbitrary protocol values', () {
       expect(WuKongReasonCode.success.value, equals(1));
       expect(WuKongReasonCode.authFail.value, equals(2));
-      expect(WuKongReasonCode.fromValue(1), equals(WuKongReasonCode.success));
-      expect(WuKongReasonCode.fromValue(2), equals(WuKongReasonCode.authFail));
-      expect(WuKongReasonCode.fromValue(99), equals(WuKongReasonCode.unknown));
+      expect(const WuKongReasonCode(1), equals(WuKongReasonCode.success));
+      expect(const WuKongReasonCode(2), equals(WuKongReasonCode.authFail));
+      expect(const WuKongReasonCode(99).value, equals(99));
     });
 
     test('Event notification model works', () {

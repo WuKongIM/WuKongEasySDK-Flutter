@@ -30,7 +30,7 @@
 
 ```yaml
 dependencies:
-  wukong_easy_sdk: ^1.0.0
+  wukong_easy_sdk: ^1.0.4
 ```
 
 然后运行：

@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2026-08-28
+
+### Added
+- Pull request CI for static analysis and the full Flutter test suite
+
+### Fixed
+- Document and verify the WuKongIM device flag contract: APP `0`, WEB `1`, and PC `2`
+- Remove the stale unused default device flag integer that represented APP as `1`
+- Update reason code tests for the value-preserving `WuKongReasonCode` API introduced in 1.0.3
+- Replace deprecated example color APIs with Flutter 3-compatible alpha values
+
 
 ## [1.0.3] - 2026-03-22
 
