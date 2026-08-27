@@ -56,4 +56,3 @@ class EventNotification {
     return 'EventNotification(id: $id, type: $type, timestamp: $timestamp)';
   }
 }
-

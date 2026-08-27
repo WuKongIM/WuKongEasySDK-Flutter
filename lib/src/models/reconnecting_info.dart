@@ -17,4 +17,3 @@ class ReconnectingInfo {
     return 'ReconnectingInfo(attempt: $attempt, delay: $delay ms)';
   }
 }
-
