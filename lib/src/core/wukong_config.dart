@@ -1,4 +1,5 @@
 import '../enums/wukong_device_flag.dart';
+import '../utils/wukong_logger.dart';
 
 /// Configuration class for WuKong SDK
 ///
@@ -19,6 +20,13 @@ class WuKongConfig {
   /// Device flag indicating the type of device (defaults to app)
   final WuKongDeviceFlag deviceFlag;
 
+  /// Enables SDK diagnostic logging. Disabled by default to protect message
+  /// payloads and authentication material in production builds.
+  final bool debugLogging;
+
+  /// Optional application-owned sink for enabled diagnostic logs.
+  final WuKongLogHandler? logHandler;
+
   /// Creates a new WuKong configuration
   const WuKongConfig({
     required this.serverUrl,
@@ -26,6 +34,8 @@ class WuKongConfig {
     required this.token,
     this.deviceId,
     this.deviceFlag = WuKongDeviceFlag.app,
+    this.debugLogging = false,
+    this.logHandler,
   });
 
   /// Validates the configuration
@@ -57,6 +67,6 @@ class WuKongConfig {
 
   @override
   String toString() {
-    return 'WuKongConfig(serverUrl: $serverUrl, uid: $uid, deviceFlag: $deviceFlag)';
+    return 'WuKongConfig(deviceFlag: $deviceFlag, debugLogging: $debugLogging, credentials: [redacted])';
   }
 }

@@ -38,6 +38,6 @@ class MessagePayload {
 
   @override
   String toString() {
-    return 'MessagePayload(type: $type, content: $content)';
+    return 'MessagePayload(type: $type, dataFields: ${data?.length ?? 0}, content: [redacted])';
   }
 }

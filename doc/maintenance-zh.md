@@ -220,18 +220,19 @@ await sdk.connect();
 
 **旧 API：**
 ```dart
-sdk.onMessage = (message) => print(message);
+sdk.onMessage = handleIncomingMessage;
 ```
 
 **新 API：**
 ```dart
-sdk.addEventListener(WuKongEvent.message, (message) => print(message));
+sdk.addEventListener(WuKongEvent.message, handleIncomingMessage);
 ```
 
 **迁移步骤：**
 1. 将回调属性替换为 addEventListener 调用
 2. 存储监听器引用以便清理
-3. 更新事件处理逻辑
+3. 更新事件处理逻辑；仅在可信 UI 中展示消息内容，不要把整条消息或 Payload
+   写入日志
 ```
 
 ## 社区贡献管理

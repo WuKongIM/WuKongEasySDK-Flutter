@@ -146,6 +146,6 @@ class Message {
 
   @override
   String toString() {
-    return 'Message(messageId: $messageId, fromUid: $fromUid, channelId: $channelId)';
+    return 'Message(messageSeq: $messageSeq, channelType: $channelType, identifiers: [redacted], payload: [redacted])';
   }
 }

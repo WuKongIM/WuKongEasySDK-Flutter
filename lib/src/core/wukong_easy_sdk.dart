@@ -1,10 +1,9 @@
-import 'dart:developer' as developer;
-
 import '../enums/wukong_event.dart';
 import '../enums/wukong_channel_type.dart';
 import '../exceptions/wukong_exceptions.dart';
 import '../models/send_result.dart';
 import '../utils/event_listener.dart';
+import '../utils/wukong_logger.dart';
 import 'event_manager.dart';
 import 'wukong_client.dart';
 import 'wukong_config.dart';
@@ -26,6 +25,8 @@ class WuKongEasySDK {
   /// Configuration
   WuKongConfig? _config;
 
+  WuKongLogger _logger = const WuKongLogger();
+
   /// Whether the SDK has been initialized
   bool _isInitialized = false;
 
@@ -46,8 +47,13 @@ class WuKongEasySDK {
   ///
   /// Throws [WuKongConfigurationException] if the configuration is invalid
   Future<void> init(WuKongConfig config) async {
+    _logger = WuKongLogger(
+      enabled: config.debugLogging,
+      handler: config.logHandler,
+    );
+    _eventManager.logger = _logger;
     try {
-      developer.log('Initializing WuKong SDK...');
+      _logger.log('Initializing WuKong SDK...');
 
       // Validate configuration
       config.validate();
@@ -59,12 +65,12 @@ class WuKongEasySDK {
       _client?.dispose();
 
       // Create new client
-      _client = WuKongClient(config, _eventManager);
+      _client = WuKongClient(config, _eventManager, _logger);
 
       _isInitialized = true;
-      developer.log('WuKong SDK initialized successfully');
+      _logger.log('WuKong SDK initialized successfully');
     } catch (error) {
-      developer.log('Failed to initialize SDK: $error');
+      _logger.log('SDK initialization failed: ${error.runtimeType}');
       if (error is ArgumentError) {
         throw WuKongConfigurationException(error.message);
       }
@@ -86,11 +92,11 @@ class WuKongEasySDK {
     }
 
     try {
-      developer.log('Connecting to WuKong server...');
+      _logger.log('Connecting to WuKong server...');
       await _client!.connect();
-      developer.log('Connected to WuKong server successfully');
+      _logger.log('Connected to WuKong server successfully');
     } catch (error) {
-      developer.log('Failed to connect: $error');
+      _logger.log('SDK connection failed: ${error.runtimeType}');
       rethrow;
     }
   }
@@ -98,9 +104,9 @@ class WuKongEasySDK {
   /// Disconnects from the WuKong server
   void disconnect() {
     if (_client != null) {
-      developer.log('Disconnecting from WuKong server...');
+      _logger.log('Disconnecting from WuKong server...');
       _client!.disconnect();
-      developer.log('Disconnected from WuKong server');
+      _logger.log('Disconnected from WuKong server');
     }
   }
 
@@ -138,7 +144,7 @@ class WuKongEasySDK {
     }
 
     try {
-      developer.log('Sending message to channel $channelId...');
+      _logger.log('Sending message...');
 
       final result = await _client!.send(
         channelId: channelId,
@@ -150,10 +156,10 @@ class WuKongEasySDK {
         setting: setting,
       );
 
-      developer.log('Message sent successfully: ${result.messageId}');
+      _logger.log('Message sent successfully');
       return result;
     } catch (error) {
-      developer.log('Failed to send message: $error');
+      _logger.log('Message send failed: ${error.runtimeType}');
       rethrow;
     }
   }
@@ -165,13 +171,13 @@ class WuKongEasySDK {
   ///
   /// Example:
   /// ```dart
-  /// easySDK.addEventListener(WuKongEvent.connect, (ConnectResult result) {
-  ///   print("Connected: $result");
+  /// easySDK.addEventListener(WuKongEvent.connect, (ConnectResult _) {
+  ///   print("Connected");
   /// });
   /// ```
   void addEventListener<T>(WuKongEvent event, WuKongEventListener<T> listener) {
     _eventManager.addEventListener(event, listener);
-    developer.log('Added event listener for $event');
+    _logger.log('Added event listener for $event');
   }
 
   /// Removes a specific event listener for the specified event type
@@ -189,9 +195,9 @@ class WuKongEasySDK {
       WuKongEvent event, WuKongEventListener<T> listener) {
     final removed = _eventManager.removeEventListener(event, listener);
     if (removed) {
-      developer.log('Removed event listener for $event');
+      _logger.log('Removed event listener for $event');
     } else {
-      developer.log('Event listener not found for $event');
+      _logger.log('Event listener not found for $event');
     }
     return removed;
   }
@@ -203,7 +209,7 @@ class WuKongEasySDK {
   /// Returns the number of listeners that were removed
   int removeAllEventListeners(WuKongEvent event) {
     final count = _eventManager.removeAllEventListeners(event);
-    developer.log('Removed $count event listeners for $event');
+    _logger.log('Removed $count event listeners for $event');
     return count;
   }
 
@@ -212,7 +218,7 @@ class WuKongEasySDK {
   /// Returns the total number of listeners that were removed
   int clearAllEventListeners() {
     final count = _eventManager.clearAllEventListeners();
-    developer.log('Cleared all event listeners. Total removed: $count');
+    _logger.log('Cleared all event listeners. Total removed: $count');
     return count;
   }
 
@@ -256,7 +262,7 @@ class WuKongEasySDK {
   ///
   /// This should be called when the SDK is no longer needed to prevent memory leaks
   void dispose() {
-    developer.log('Disposing WuKong SDK...');
+    _logger.log('Disposing WuKong SDK...');
 
     _client?.dispose();
     _client = null;
@@ -266,6 +272,6 @@ class WuKongEasySDK {
     _config = null;
     _isInitialized = false;
 
-    developer.log('WuKong SDK disposed');
+    _logger.log('WuKong SDK disposed');
   }
 }

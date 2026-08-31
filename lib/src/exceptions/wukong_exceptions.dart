@@ -9,7 +9,7 @@ abstract class WuKongException implements Exception {
   const WuKongException(this.message);
 
   @override
-  String toString() => 'WuKongException: $message';
+  String toString() => 'WuKongException(details: [redacted])';
 }
 
 /// Exception thrown when trying to perform an operation while not connected
@@ -20,7 +20,7 @@ class WuKongNotConnectedException extends WuKongException {
             message ?? 'Not connected to WuKong server. Call connect() first.');
 
   @override
-  String toString() => 'WuKongNotConnectedException: $message';
+  String toString() => 'WuKongNotConnectedException';
 }
 
 /// Exception thrown when trying to send a message to an invalid channel
@@ -33,7 +33,7 @@ class WuKongInvalidChannelException extends WuKongException {
       : super(message ?? 'Invalid channel: $channelId');
 
   @override
-  String toString() => 'WuKongInvalidChannelException: $message';
+  String toString() => 'WuKongInvalidChannelException(channelId: [redacted])';
 }
 
 /// Exception thrown when trying to send a message that is too large
@@ -51,7 +51,8 @@ class WuKongMessageTooLargeException extends WuKongException {
             'Message size ($messageSize bytes) exceeds maximum allowed size ($maxSize bytes)');
 
   @override
-  String toString() => 'WuKongMessageTooLargeException: $message';
+  String toString() =>
+      'WuKongMessageTooLargeException(messageSize: $messageSize, maxSize: $maxSize)';
 }
 
 /// Exception thrown when authentication fails
@@ -62,7 +63,7 @@ class WuKongAuthenticationException extends WuKongException {
             message ?? 'Authentication failed. Please check your credentials.');
 
   @override
-  String toString() => 'WuKongAuthenticationException: $message';
+  String toString() => 'WuKongAuthenticationException';
 }
 
 /// Exception thrown when connection times out
@@ -73,7 +74,7 @@ class WuKongConnectionTimeoutException extends WuKongException {
             'Connection timeout. Please check your network connection.');
 
   @override
-  String toString() => 'WuKongConnectionTimeoutException: $message';
+  String toString() => 'WuKongConnectionTimeoutException';
 }
 
 /// Exception thrown when there's a network error
@@ -84,7 +85,7 @@ class WuKongNetworkException extends WuKongException {
             message ?? 'Network error occurred. Please check your connection.');
 
   @override
-  String toString() => 'WuKongNetworkException: $message';
+  String toString() => 'WuKongNetworkException';
 }
 
 /// Exception thrown when the configuration is invalid
@@ -94,7 +95,7 @@ class WuKongConfigurationException extends WuKongException {
       : super(message ?? 'Invalid configuration provided.');
 
   @override
-  String toString() => 'WuKongConfigurationException: $message';
+  String toString() => 'WuKongConfigurationException';
 }
 
 /// Exception thrown when there's a protocol error
@@ -104,5 +105,5 @@ class WuKongProtocolException extends WuKongException {
       : super(message ?? 'Protocol error occurred.');
 
   @override
-  String toString() => 'WuKongProtocolException: $message';
+  String toString() => 'WuKongProtocolException';
 }

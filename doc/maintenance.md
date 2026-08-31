@@ -220,18 +220,19 @@ await sdk.connect();
 
 **Old API:**
 ```dart
-sdk.onMessage = (message) => print(message);
+sdk.onMessage = handleIncomingMessage;
 ```
 
 **New API:**
 ```dart
-sdk.addEventListener(WuKongEvent.message, (message) => print(message));
+sdk.addEventListener(WuKongEvent.message, handleIncomingMessage);
 ```
 
 **Migration Steps:**
 1. Replace callback properties with addEventListener calls
 2. Store listener references for cleanup
-3. Update event handling logic
+3. Update event handling logic; render message content in a trusted UI instead
+   of writing the message or payload to logs
 ```
 
 ## Community Contribution Management

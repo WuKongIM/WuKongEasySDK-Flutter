@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Add opt-in `debugLogging` and an optional application-owned `logHandler`
+
+### Security
+- Disable SDK diagnostic logs by default
+- Redact authentication parameters, message payloads, raw WebSocket frames, and parser input from enabled diagnostics
+- Replace request/response IDs with presence metadata and map unknown protocol methods to `unknown`
+- Redact credentials, payloads, identifiers, reasons, and error text from public object string representations
+
 ## [1.0.4] - 2026-08-28
 
 ### Added

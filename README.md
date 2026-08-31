@@ -39,6 +39,10 @@ Then run:
 flutter pub get
 ```
 
+> **Next release:** `debugLogging` and `logHandler` are available on the
+> current `main` branch and will ship in the next package release. They are not
+> part of the published `1.0.4` package.
+
 ## 🚀 Quick Start
 
 ### Step 1: Import the SDK
@@ -57,11 +61,27 @@ final config = WuKongConfig(
   token: "your_auth_token",                         // Authentication token
   deviceId: "device_001",                           // Optional: Device identifier
   deviceFlag: WuKongDeviceFlag.app,                 // Optional: Device type (app/web/pc)
+  debugLogging: false,                               // Optional: disabled by default
 );
 
 // Get SDK instance and initialize
 final easySDK = WuKongEasySDK.getInstance();
 await easySDK.init(config);
+```
+
+Diagnostic logging is opt-in. When enabled, the SDK logs protocol stages and
+whether a request ID is present, but never the ID itself, authentication
+parameters, message payloads, or raw WebSocket frames. You can route those
+diagnostics into your own logging system:
+
+```dart
+final config = WuKongConfig(
+  serverUrl: "wss://your-wukongim-server.com/ws",
+  uid: "user123",
+  token: "your_auth_token",
+  debugLogging: true,
+  logHandler: (message) => yourLogger.debug(message),
+);
 ```
 
 ### Step 3: Set up Event Listeners
@@ -75,19 +95,20 @@ easySDK.addEventListener(WuKongEvent.connect, (ConnectResult result) {
 });
 
 easySDK.addEventListener(WuKongEvent.disconnect, (DisconnectInfo info) {
-  print("❌ Disconnected: ${info.reason} (Code: ${info.code})");
+  print("❌ Disconnected (Code: ${info.code})");
+  // Do not write info.reason to logs; map it to trusted user-facing copy.
 });
 
 // Listen for incoming messages
 easySDK.addEventListener(WuKongEvent.message, (Message message) {
-  print("📨 New message from ${message.fromUid}:");
-  print("Content: ${message.payload}");
-  print("Channel: ${message.channelId}");
+  print("📨 New message received");
+  // Decode and render message.payload only in a trusted UI; do not log it.
 });
 
 // Listen for errors
 easySDK.addEventListener(WuKongEvent.error, (WuKongError error) {
-  print("🚨 Error: ${error.message}");
+  print("🚨 SDK error (Code: ${error.code.name})");
+  // Keep error.message and error.data out of production logs.
 });
 ```
 
@@ -98,8 +119,8 @@ try {
   await easySDK.connect();
   print("🎉 Connected to WuKongIM server!");
 } catch (e) {
-  print("💥 Connection failed: $e");
-  // Handle connection error
+  print("💥 Connection failed");
+  // Handle the error without logging the raw exception.
 }
 ```
 
@@ -121,10 +142,11 @@ try {
   );
 
   print("✅ Message sent successfully!");
-  print("Message ID: ${result.messageId}");
   print("Message Sequence: ${result.messageSeq}");
+  // Keep the server-provided result.messageId out of application logs.
 } catch (e) {
-  print("❌ Failed to send message: $e");
+  print("❌ Failed to send message");
+  // Report only a fixed category or other explicitly safe metadata.
 }
 ```
 
@@ -193,7 +215,8 @@ class _ChatPageState extends State<ChatPage> {
     try {
       await easySDK.connect();
     } catch (e) {
-      print("Connection failed: $e");
+      print("Connection failed");
+      // Do not interpolate the raw exception into application logs.
     }
   }
 
@@ -206,14 +229,16 @@ class _ChatPageState extends State<ChatPage> {
     };
 
     messageListener = (Message message) {
-      _addMessage("${message.fromUid}: ${message.payload}");
+      _addMessage("New message received");
+      // Decode message.payload and render it only in the trusted chat UI.
     };
 
     disconnectListener = (DisconnectInfo info) {
       setState(() {
         isConnected = false;
       });
-      _addMessage("Disconnected: ${info.reason}");
+      _addMessage("Disconnected");
+      // Map info.reason to trusted user-facing copy instead of logging it.
     };
 
     easySDK.addEventListener(WuKongEvent.connect, connectListener!);
@@ -238,7 +263,8 @@ class _ChatPageState extends State<ChatPage> {
       );
       _addMessage("You: $content");
     } catch (e) {
-      _addMessage("Failed to send: $e");
+      _addMessage("Failed to send");
+      // Keep the raw exception out of logs and user-visible diagnostics.
     }
   }
 
@@ -438,26 +464,30 @@ try {
     print("❌ Not connected to server");
     // Show connection error to user
   } else if (e is WuKongConfigurationException) {
-    print("⚙️ Configuration error: ${e.message}");
+    print("⚙️ Configuration error");
     // Fix configuration issues
   } else if (e is WuKongProtocolException) {
-    print("🔌 Protocol error: ${e.message}");
+    print("🔌 Protocol error");
     // Handle protocol-level errors
   } else if (e is WuKongNetworkException) {
-    print("🌐 Network error: ${e.message}");
+    print("🌐 Network error");
     // Handle network connectivity issues
   } else if (e is WuKongAuthenticationException) {
-    print("🔐 Authentication failed: ${e.message}");
+    print("🔐 Authentication failed");
     // Handle authentication errors
   } else if (e is WuKongConnectionTimeoutException) {
-    print("⏰ Connection timeout: ${e.message}");
+    print("⏰ Connection timeout");
     // Handle timeout scenarios
   } else {
-    print("💥 Unexpected error: $e");
+    print("💥 Unexpected error");
     // Handle other errors
   }
 }
 ```
+
+Exception messages, disconnect reasons, and message payloads may contain
+server- or user-controlled data. Do not write them directly to production logs;
+map them to fixed categories and explicitly safe metadata first.
 
 ## 💡 Best Practices
 

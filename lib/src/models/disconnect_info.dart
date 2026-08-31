@@ -38,6 +38,6 @@ class DisconnectInfo {
 
   @override
   String toString() {
-    return 'DisconnectInfo(code: $code, reason: $reason)';
+    return 'DisconnectInfo(code: $code, reason: [redacted])';
   }
 }

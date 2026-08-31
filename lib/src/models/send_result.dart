@@ -40,6 +40,6 @@ class SendResult {
 
   @override
   String toString() {
-    return 'SendResult(messageId: $messageId, messageSeq: $messageSeq, reasonCode: $reasonCode)';
+    return 'SendResult(messageSeq: $messageSeq, reasonCode: $reasonCode, messageId: [redacted])';
   }
 }
