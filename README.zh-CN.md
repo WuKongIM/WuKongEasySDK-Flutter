@@ -30,7 +30,7 @@
 
 ```yaml
 dependencies:
-  wukong_easy_sdk: ^1.0.4
+  wukong_easy_sdk: ^1.1.0
 ```
 
 然后运行：
@@ -38,9 +38,6 @@ dependencies:
 ```bash
 flutter pub get
 ```
-
-> **下一版本：** 下文的 `debugLogging` 与 `logHandler` 已在当前 `main`
-> 分支提供，将随下一次包发布上线；已发布的 `1.0.4` 尚不包含这两个配置项。
 
 ## 🚀 快速开始
 

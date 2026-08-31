@@ -30,7 +30,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  wukong_easy_sdk: ^1.0.4
+  wukong_easy_sdk: ^1.1.0
 ```
 
 Then run:
@@ -38,10 +38,6 @@ Then run:
 ```bash
 flutter pub get
 ```
-
-> **Next release:** `debugLogging` and `logHandler` are available on the
-> current `main` branch and will ship in the next package release. They are not
-> part of the published `1.0.4` package.
 
 ## 🚀 Quick Start
 
