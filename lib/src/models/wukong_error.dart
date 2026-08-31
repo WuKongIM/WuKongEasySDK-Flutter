@@ -98,6 +98,6 @@ class WuKongError {
 
   @override
   String toString() {
-    return 'WuKongError(code: $code, message: $message)';
+    return 'WuKongError(code: $code, details: [redacted])';
   }
 }

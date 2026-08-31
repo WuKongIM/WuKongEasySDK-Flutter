@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer' as developer;
 import 'dart:math';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -18,6 +17,7 @@ import '../models/wukong_error.dart';
 import '../utils/json_rpc.dart';
 import '../utils/uuid_generator.dart';
 import '../utils/wukong_constants.dart';
+import '../utils/wukong_logger.dart';
 import 'event_manager.dart';
 import 'wukong_config.dart';
 
@@ -25,6 +25,18 @@ import 'wukong_config.dart';
 ///
 /// Handles WebSocket connection, JSON-RPC protocol, ping/pong heartbeat, and reconnection logic.
 class WuKongClient {
+  static const Set<String> _knownProtocolMethods = {
+    'connect',
+    'send',
+    'recv',
+    'recvack',
+    'ping',
+    'pong',
+    'disconnect',
+    'event',
+    'sendack',
+  };
+
   /// WebSocket channel
   WebSocketChannel? _channel;
 
@@ -33,6 +45,9 @@ class WuKongClient {
 
   /// Event manager
   final EventManager _eventManager;
+
+  /// Configuration-controlled diagnostic logger.
+  final WuKongLogger _logger;
 
   /// Whether the client is connected
   bool _isConnected = false;
@@ -62,7 +77,7 @@ class WuKongClient {
   StreamSubscription? _messageSubscription;
 
   /// Creates a new WuKong client
-  WuKongClient(this._config, this._eventManager);
+  WuKongClient(this._config, this._eventManager, this._logger);
 
   /// Whether the client is connected
   bool get isConnected => _isConnected;
@@ -73,7 +88,7 @@ class WuKongClient {
   /// Connects to the WebSocket server
   Future<void> connect() async {
     if (_isConnected || _isConnecting) {
-      developer.log('Already connected or connecting');
+      _logger.log('Already connected or connecting');
       if (_connectionCompleter != null) {
         return _connectionCompleter!.future;
       }
@@ -86,7 +101,7 @@ class WuKongClient {
     final future = _connectionCompleter!.future;
 
     try {
-      developer.log('Connecting to ${_config.serverUrl}...');
+      _logger.log('Connecting to WuKong server...');
 
       // Create WebSocket connection
       _channel = WebSocketChannel.connect(Uri.parse(_config.serverUrl));
@@ -105,7 +120,7 @@ class WuKongClient {
         _connectionCompleter!.complete();
       }
     } catch (error) {
-      developer.log('Failed to connect: $error');
+      _logger.log('Connection failed: ${error.runtimeType}');
       _isConnecting = false;
       if (_connectionCompleter != null && !_connectionCompleter!.isCompleted) {
         _connectionCompleter!.completeError(error);
@@ -121,7 +136,7 @@ class WuKongClient {
 
   /// Disconnects from the WebSocket server
   void disconnect() {
-    developer.log('Manual disconnect initiated');
+    _logger.log('Manual disconnect initiated');
     _manualDisconnect = true;
     _isReconnecting = false;
     _handleDisconnect();
@@ -215,7 +230,9 @@ class WuKongClient {
 
     try {
       final message = jsonEncode(request.toJson());
-      developer.log('--> Sending request: $message');
+      _logger.log(
+        '--> JSON-RPC request method=${_diagnosticMethod(method)} id=present',
+      );
       _channel!.sink.add(message);
     } catch (error) {
       timer.cancel();
@@ -229,7 +246,7 @@ class WuKongClient {
   /// Sends a JSON-RPC notification (no response expected)
   void _sendNotification(String method, dynamic params) {
     if (_channel == null) {
-      developer.log('Cannot send notification, not connected');
+      _logger.log('Cannot send notification, not connected');
       return;
     }
 
@@ -240,10 +257,12 @@ class WuKongClient {
 
     try {
       final message = jsonEncode(notification.toJson());
-      developer.log('--> Sending notification: $message');
+      _logger.log(
+        '--> JSON-RPC notification method=${_diagnosticMethod(method)}',
+      );
       _channel!.sink.add(message);
     } catch (error) {
-      developer.log('Error sending notification: $error');
+      _logger.log('JSON-RPC notification failed: ${error.runtimeType}');
     }
   }
 
@@ -255,7 +274,7 @@ class WuKongClient {
           'connect', params, WuKongConstants.connectTimeoutMs);
 
       final connectResult = ConnectResult.fromJson(result);
-      developer.log('Authentication successful: $connectResult');
+      _logger.log('Authentication successful');
 
       _isConnected = true;
       _isConnecting = false;
@@ -265,7 +284,7 @@ class WuKongClient {
       _startPing();
       _eventManager.emit(WuKongEvent.connect, connectResult);
     } catch (error) {
-      developer.log('Authentication failed: $error');
+      _logger.log('Authentication failed: ${error.runtimeType}');
       _isConnecting = false;
 
       final wukongError = error is WuKongException
@@ -281,7 +300,7 @@ class WuKongClient {
   /// Handles incoming WebSocket messages
   void _handleMessage(dynamic data) {
     try {
-      developer.log('<-- Received: $data');
+      _logger.log('<-- WebSocket message received');
       final json = jsonDecode(data.toString()) as Map<String, dynamic>;
 
       if (json.containsKey('id')) {
@@ -291,21 +310,21 @@ class WuKongClient {
         // It's a notification
         _handleNotification(JsonRpcNotification.fromJson(json));
       } else {
-        developer.log('Unknown message format: $json');
+        _logger.log('Unknown JSON-RPC message shape');
       }
     } catch (error) {
-      developer.log('Error parsing message: $error');
+      _logger.log('JSON-RPC message parsing failed: ${error.runtimeType}');
       _eventManager.emit(
           WuKongEvent.error,
           WuKongError.fromException(
-            Exception('Failed to parse message: $error'),
+            Exception('Failed to parse JSON-RPC message'),
           ));
     }
   }
 
   /// Handles JSON-RPC responses
   void _handleResponse(JsonRpcResponse response) {
-    developer.log('<-- Handling response: ${response.id}');
+    _logger.log('<-- Handling response id=present');
 
     final pending = _pendingRequests.remove(response.id);
     if (pending != null) {
@@ -317,13 +336,14 @@ class WuKongClient {
         pending.resolve(response.result);
       }
     } else {
-      developer.log('Received response for unknown request: ${response.id}');
+      _logger.log('Received response for unknown request id=present');
     }
   }
 
   /// Handles JSON-RPC notifications
   void _handleNotification(JsonRpcNotification notification) {
-    developer.log('<-- Handling notification: ${notification.method}');
+    final diagnosticMethod = _diagnosticMethod(notification.method);
+    _logger.log('<-- Handling notification method=$diagnosticMethod');
 
     switch (notification.method) {
       case 'recv':
@@ -342,7 +362,7 @@ class WuKongClient {
         _handleSendAckNotification(notification.params);
         break;
       default:
-        developer.log('Unknown notification method: ${notification.method}');
+        _logger.log('Unknown notification method=unknown');
     }
   }
 
@@ -356,18 +376,18 @@ class WuKongClient {
       _sendRecvAck(
           message.header.toJson(), message.messageId, message.messageSeq);
     } catch (error) {
-      developer.log('Error handling recv notification: $error');
+      _logger.log('RECV notification handling failed: ${error.runtimeType}');
     }
   }
 
   /// Handles pong notifications
   void _handlePongNotification() {
-    developer.log('Pong received');
+    _logger.log('Pong received');
   }
 
   /// Handles server-initiated disconnect
   void _handleServerDisconnect(dynamic params) {
-    developer.log('Server initiated disconnect: $params');
+    _logger.log('Server initiated disconnect');
     final disconnectInfo =
         DisconnectInfo.fromJson(params as Map<String, dynamic>? ?? {});
     _eventManager.emit(WuKongEvent.disconnect, disconnectInfo);
@@ -380,7 +400,7 @@ class WuKongClient {
       final event = EventNotification.fromJson(params as Map<String, dynamic>);
       _eventManager.emit(WuKongEvent.customEvent, event);
     } catch (error) {
-      developer.log('Error handling event notification: $error');
+      _logger.log('Event notification handling failed: ${error.runtimeType}');
     }
   }
 
@@ -390,7 +410,7 @@ class WuKongClient {
       final result = SendResult.fromJson(params as Map<String, dynamic>);
       _eventManager.emit(WuKongEvent.sendAck, result);
     } catch (error) {
-      developer.log('Error handling sendack notification: $error');
+      _logger.log('SENDACK notification handling failed: ${error.runtimeType}');
     }
   }
 
@@ -420,7 +440,7 @@ class WuKongClient {
       },
     );
 
-    developer.log(
+    _logger.log(
         'Ping timer started (${WuKongConstants.pingIntervalMs}ms interval)');
   }
 
@@ -428,7 +448,7 @@ class WuKongClient {
   void _stopPing() {
     _pingTimer?.cancel();
     _pingTimer = null;
-    developer.log('Ping timer stopped');
+    _logger.log('Ping timer stopped');
   }
 
   /// Sends a ping request
@@ -436,19 +456,19 @@ class WuKongClient {
     try {
       _sendRequest('ping', {}, WuKongConstants.pongTimeoutMs)
           .catchError((error) {
-        developer.log('Ping failed: $error');
+        _logger.log('Ping failed: ${error.runtimeType}');
         _eventManager.emit(
             WuKongEvent.error, WuKongError.timeoutError('Ping timeout'));
         _tryReconnect();
       });
     } catch (error) {
-      developer.log('Error sending ping: $error');
+      _logger.log('Ping send failed: ${error.runtimeType}');
     }
   }
 
   /// Handles WebSocket errors
   void _handleError(dynamic error) {
-    developer.log('WebSocket error: $error');
+    _logger.log('WebSocket failed: ${error.runtimeType}');
 
     final wukongError = WuKongError.networkError('WebSocket error: $error');
     _eventManager.emit(WuKongEvent.error, wukongError);
@@ -457,7 +477,7 @@ class WuKongClient {
   /// Handles WebSocket disconnection
   void _handleDisconnect() {
     final wasConnected = _isConnected;
-    developer.log('WebSocket disconnected. Was connected: $wasConnected');
+    _logger.log('WebSocket disconnected. Was connected: $wasConnected');
 
     final disconnectInfo = DisconnectInfo(
       code: _manualDisconnect ? 1000 : 1006,
@@ -486,7 +506,7 @@ class WuKongClient {
   /// Schedules the next reconnection attempt
   void _scheduleReconnect() {
     if (_reconnectAttempts >= WuKongConstants.maxReconnectAttempts) {
-      developer.log('Max reconnect attempts reached. Giving up.');
+      _logger.log('Max reconnect attempts reached. Giving up.');
       _isReconnecting = false;
       _reconnectAttempts = 0;
       _eventManager.emit(
@@ -498,7 +518,7 @@ class WuKongClient {
         WuKongConstants.initialReconnectDelayMs * pow(2, _reconnectAttempts);
     _reconnectAttempts++;
 
-    developer
+    _logger
         .log('Scheduling reconnect attempt $_reconnectAttempts in ${delay}ms');
 
     _eventManager.emit(
@@ -511,12 +531,12 @@ class WuKongClient {
 
     Timer(Duration(milliseconds: delay.toInt()), () {
       if (!_isReconnecting) {
-        developer.log('Reconnection cancelled');
+        _logger.log('Reconnection cancelled');
         return;
       }
 
       connect().catchError((error) {
-        developer.log('Reconnection attempt failed: $error');
+        _logger.log('Reconnection attempt failed: ${error.runtimeType}');
         if (_isReconnecting) {
           _scheduleReconnect();
         }
@@ -546,7 +566,7 @@ class WuKongClient {
     try {
       _channel?.sink.close();
     } catch (error) {
-      developer.log('Error closing WebSocket: $error');
+      _logger.log('WebSocket close failed: ${error.runtimeType}');
     }
     _channel = null;
 
@@ -560,9 +580,14 @@ class WuKongClient {
 
   /// Disposes the client and cleans up all resources
   void dispose() {
-    developer.log('Disposing WuKong client');
+    _logger.log('Disposing WuKong client');
     _manualDisconnect = true;
     _isReconnecting = false;
     _cleanup();
+  }
+
+  /// Returns only protocol method names controlled by this SDK.
+  static String _diagnosticMethod(String method) {
+    return _knownProtocolMethods.contains(method) ? method : 'unknown';
   }
 }

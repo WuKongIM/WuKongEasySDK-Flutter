@@ -78,42 +78,38 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
   }
 
   void _setupEventListeners() {
-    connectListener = (ConnectResult result) {
+    connectListener = (ConnectResult _) {
       if (mounted) {
         setState(() {
           _isConnected = true;
           _isConnecting = false;
         });
-        _addLog('Connected to server! (Reason: ${result.reasonCode})',
-            LogType.success);
+        _addLog('Connected to server!', LogType.success);
       }
     };
 
-    disconnectListener = (DisconnectInfo info) {
+    disconnectListener = (DisconnectInfo _) {
       if (mounted) {
         setState(() {
           _isConnected = false;
           _isConnecting = false;
         });
-        _addLog('Disconnected. Code: ${info.code}, Reason: ${info.reason}',
-            LogType.info);
+        _addLog('Disconnected from server.', LogType.info);
       }
     };
 
-    messageListener = (Message message) {
+    messageListener = (Message _) {
       if (mounted) {
-        _addLog(
-            'Received message from ${message.fromUid}: ${jsonEncode(message.payload)}',
-            LogType.incoming);
+        _addLog('Received a message.', LogType.incoming);
       }
     };
 
-    errorListener = (WuKongError error) {
+    errorListener = (WuKongError _) {
       if (mounted) {
         setState(() {
           _isConnecting = false;
         });
-        _addLog('Error: ${error.message}', LogType.error);
+        _addLog('SDK operation failed.', LogType.error);
       }
     };
 
@@ -158,7 +154,7 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
       _isConnecting = true;
     });
 
-    _addLog('Connecting to ${_serverUrlController.text}...', LogType.info);
+    _addLog('Connecting to server...', LogType.info);
 
     try {
       final config = WuKongConfig(
@@ -170,11 +166,11 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
 
       await easySDK.init(config);
       await easySDK.connect();
-    } catch (e) {
+    } catch (_) {
       setState(() {
         _isConnecting = false;
       });
-      _addLog('Connection failed: $e', LogType.error);
+      _addLog('Connection failed.', LogType.error);
     }
   }
 
@@ -190,18 +186,17 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
       // Parse the JSON message
       final messageJson = jsonDecode(_messageJsonController.text);
 
-      _addLog('Sending message to ${_targetUserIdController.text}...',
-          LogType.outgoing);
+      _addLog('Sending message...', LogType.outgoing);
 
-      final result = await easySDK.send(
+      await easySDK.send(
         channelId: _targetUserIdController.text,
         channelType: WuKongChannelType.person,
         payload: messageJson,
       );
 
-      _addLog('Message sent! ID: ${result.messageId}', LogType.success);
-    } catch (e) {
-      _addLog('Send message failed: $e', LogType.error);
+      _addLog('Message sent!', LogType.success);
+    } catch (_) {
+      _addLog('Send message failed.', LogType.error);
     }
   }
 

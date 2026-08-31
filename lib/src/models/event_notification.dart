@@ -53,6 +53,6 @@ class EventNotification {
 
   @override
   String toString() {
-    return 'EventNotification(id: $id, type: $type, timestamp: $timestamp)';
+    return 'EventNotification(timestamp: $timestamp, id: [redacted], type: [redacted], data: [redacted])';
   }
 }

@@ -39,6 +39,9 @@ dependencies:
 flutter pub get
 ```
 
+> **下一版本：** 下文的 `debugLogging` 与 `logHandler` 已在当前 `main`
+> 分支提供，将随下一次包发布上线；已发布的 `1.0.4` 尚不包含这两个配置项。
+
 ## 🚀 快速开始
 
 ### 步骤 1：导入 SDK
@@ -57,11 +60,25 @@ final config = WuKongConfig(
   token: "your_auth_token",                         // 身份验证令牌
   deviceId: "device_001",                           // 可选：设备标识符
   deviceFlag: WuKongDeviceFlag.app,                 // 可选：设备类型（app/web/pc）
+  debugLogging: false,                               // 可选：默认关闭
 );
 
 // 获取 SDK 实例并初始化
 final easySDK = WuKongEasySDK.getInstance();
 await easySDK.init(config);
+```
+
+SDK 诊断日志默认关闭。开启后只记录协议阶段及请求 ID 是否存在，不记录 ID
+本身、认证参数、消息 Payload 或原始 WebSocket 报文。也可以把诊断信息接入应用自己的日志系统：
+
+```dart
+final config = WuKongConfig(
+  serverUrl: "wss://your-wukongim-server.com/ws",
+  uid: "user123",
+  token: "your_auth_token",
+  debugLogging: true,
+  logHandler: (message) => yourLogger.debug(message),
+);
 ```
 
 ### 步骤 3：设置事件监听器
@@ -75,19 +92,20 @@ easySDK.addEventListener(WuKongEvent.connect, (ConnectResult result) {
 });
 
 easySDK.addEventListener(WuKongEvent.disconnect, (DisconnectInfo info) {
-  print("❌ 连接断开: ${info.reason} (代码: ${info.code})");
+  print("❌ 连接断开（代码: ${info.code}）");
+  // 不要把 info.reason 写入日志；请映射为可信的用户提示。
 });
 
 // 监听接收消息
 easySDK.addEventListener(WuKongEvent.message, (Message message) {
-  print("📨 来自 ${message.fromUid} 的新消息:");
-  print("内容: ${message.payload}");
-  print("频道: ${message.channelId}");
+  print("📨 收到新消息");
+  // 仅在可信 UI 中解析并展示 message.payload，不要将其写入日志。
 });
 
 // 监听错误
 easySDK.addEventListener(WuKongEvent.error, (WuKongError error) {
-  print("🚨 错误: ${error.message}");
+  print("🚨 SDK 错误（代码: ${error.code.name}）");
+  // 生产日志不要记录 error.message 与 error.data。
 });
 ```
 
@@ -98,8 +116,8 @@ try {
   await easySDK.connect();
   print("🎉 已连接到 WuKongIM 服务器！");
 } catch (e) {
-  print("💥 连接失败: $e");
-  // 处理连接错误
+  print("💥 连接失败");
+  // 处理错误，但不要把原始异常写入日志。
 }
 ```
 
@@ -121,10 +139,11 @@ try {
   );
   
   print("✅ 消息发送成功！");
-  print("消息 ID: ${result.messageId}");
   print("消息序号: ${result.messageSeq}");
+  // 不要把服务端返回的 result.messageId 写入应用日志。
 } catch (e) {
-  print("❌ 发送消息失败: $e");
+  print("❌ 发送消息失败");
+  // 只上报固定分类或其他明确安全的元数据。
 }
 ```
 
@@ -193,7 +212,8 @@ class _ChatPageState extends State<ChatPage> {
     try {
       await easySDK.connect();
     } catch (e) {
-      print("连接失败: $e");
+      print("连接失败");
+      // 不要把原始异常插入应用日志。
     }
   }
 
@@ -206,14 +226,16 @@ class _ChatPageState extends State<ChatPage> {
     };
 
     messageListener = (Message message) {
-      _addMessage("${message.fromUid}: ${message.payload}");
+      _addMessage("收到新消息");
+      // 仅在可信聊天 UI 中解析并展示 message.payload。
     };
 
     disconnectListener = (DisconnectInfo info) {
       setState(() {
         isConnected = false;
       });
-      _addMessage("连接断开: ${info.reason}");
+      _addMessage("连接断开");
+      // 将 info.reason 映射为可信用户提示，不要直接记录。
     };
 
     easySDK.addEventListener(WuKongEvent.connect, connectListener!);
@@ -238,7 +260,8 @@ class _ChatPageState extends State<ChatPage> {
       );
       _addMessage("您: $content");
     } catch (e) {
-      _addMessage("发送失败: $e");
+      _addMessage("发送失败");
+      // 不要在日志或面向用户的诊断信息中记录原始异常。
     }
   }
 
@@ -438,26 +461,29 @@ try {
     print("❌ 未连接到服务器");
     // 向用户显示连接错误
   } else if (e is WuKongConfigurationException) {
-    print("⚙️ 配置错误: ${e.message}");
+    print("⚙️ 配置错误");
     // 修复配置问题
   } else if (e is WuKongProtocolException) {
-    print("🔌 协议错误: ${e.message}");
+    print("🔌 协议错误");
     // 处理协议级错误
   } else if (e is WuKongNetworkException) {
-    print("🌐 网络错误: ${e.message}");
+    print("🌐 网络错误");
     // 处理网络连接问题
   } else if (e is WuKongAuthenticationException) {
-    print("🔐 身份验证失败: ${e.message}");
+    print("🔐 身份验证失败");
     // 处理身份验证错误
   } else if (e is WuKongConnectionTimeoutException) {
-    print("⏰ 连接超时: ${e.message}");
+    print("⏰ 连接超时");
     // 处理超时场景
   } else {
-    print("💥 意外错误: $e");
+    print("💥 意外错误");
     // 处理其他错误
   }
 }
 ```
+
+异常消息、断开原因及消息 Payload 可能包含服务端或用户可控数据。生产日志不要
+直接记录这些内容；应先映射为固定分类和明确安全的元数据。
 
 ## 💡 最佳实践
 

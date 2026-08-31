@@ -1,7 +1,6 @@
-import 'dart:developer' as developer;
-
 import '../enums/wukong_event.dart';
 import '../utils/event_listener.dart';
+import '../utils/wukong_logger.dart';
 
 /// Event manager for handling event listeners and dispatching events
 ///
@@ -10,13 +9,18 @@ class EventManager {
   /// Map of event types to their listeners
   final Map<WuKongEvent, List<Function>> _listeners = {};
 
+  WuKongLogger _logger;
+
   /// Creates a new event manager
-  EventManager() {
+  EventManager([this._logger = const WuKongLogger()]) {
     // Initialize listener lists for all event types
     for (final event in WuKongEvent.values) {
       _listeners[event] = [];
     }
   }
+
+  /// Updates the diagnostic logger when the SDK is initialized again.
+  set logger(WuKongLogger value) => _logger = value;
 
   /// Adds an event listener for the specified event type
   ///
@@ -26,10 +30,10 @@ class EventManager {
     final listeners = _listeners[event];
     if (listeners != null) {
       listeners.add(listener);
-      developer.log(
+      _logger.log(
           'Added event listener for $event. Total listeners: ${listeners.length}');
     } else {
-      developer
+      _logger
           .log('Warning: Attempted to add listener for unknown event: $event');
     }
   }
@@ -46,14 +50,14 @@ class EventManager {
     if (listeners != null) {
       final removed = listeners.remove(listener);
       if (removed) {
-        developer.log(
+        _logger.log(
             'Removed event listener for $event. Remaining listeners: ${listeners.length}');
       } else {
-        developer.log('Warning: Listener not found for event: $event');
+        _logger.log('Warning: Listener not found for event: $event');
       }
       return removed;
     } else {
-      developer.log(
+      _logger.log(
           'Warning: Attempted to remove listener for unknown event: $event');
       return false;
     }
@@ -69,10 +73,10 @@ class EventManager {
     if (listeners != null) {
       final count = listeners.length;
       listeners.clear();
-      developer.log('Removed all $count listeners for event: $event');
+      _logger.log('Removed all $count listeners for event: $event');
       return count;
     } else {
-      developer.log(
+      _logger.log(
           'Warning: Attempted to clear listeners for unknown event: $event');
       return 0;
     }
@@ -86,7 +90,7 @@ class EventManager {
     for (final event in WuKongEvent.values) {
       totalRemoved += removeAllEventListeners(event);
     }
-    developer.log('Cleared all event listeners. Total removed: $totalRemoved');
+    _logger.log('Cleared all event listeners. Total removed: $totalRemoved');
     return totalRemoved;
   }
 
@@ -97,7 +101,7 @@ class EventManager {
   void emit<T>(WuKongEvent event, T data) {
     final listeners = _listeners[event];
     if (listeners != null && listeners.isNotEmpty) {
-      developer.log('Emitting event $event to ${listeners.length} listeners');
+      _logger.log('Emitting event $event to ${listeners.length} listeners');
 
       // Create a copy of the listeners list to avoid modification during iteration
       final listenersCopy = List<Function>.from(listeners);
@@ -111,16 +115,14 @@ class EventManager {
             // Fallback for dynamic listeners
             listener(data);
           }
-        } catch (error, stackTrace) {
-          developer.log(
-            'Error in event listener for $event: $error',
-            error: error,
-            stackTrace: stackTrace,
+        } catch (error) {
+          _logger.log(
+            'Event listener failed for $event: ${error.runtimeType}',
           );
         }
       }
     } else {
-      developer.log('No listeners registered for event: $event');
+      _logger.log('No listeners registered for event: $event');
     }
   }
 

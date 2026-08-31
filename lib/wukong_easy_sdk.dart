@@ -29,3 +29,4 @@ export 'src/exceptions/wukong_exceptions.dart';
 
 // Event listener typedef
 export 'src/utils/event_listener.dart';
+export 'src/utils/wukong_logger.dart' show WuKongLogHandler;
