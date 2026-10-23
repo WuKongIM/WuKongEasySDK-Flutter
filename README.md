@@ -30,7 +30,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  wukong_easy_sdk: ^1.2.0
+  wukong_easy_sdk: ^1.2.1
 ```
 
 Then run:

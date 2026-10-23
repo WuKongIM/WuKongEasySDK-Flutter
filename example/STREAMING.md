@@ -32,6 +32,6 @@ python3 example/tools/stream_acceptance.py \
   --output /tmp/wk-flutter-stream
 ```
 
-Requires Flutter, Xcode and Python 3 on macOS. The runner starts its own temporary single-node cluster (256 hash slots) and fragmented SSE fixture. It compiles and runs the real Flutter screen controller with actual SDK WebSockets, then saves JSON evidence plus partial/completed/recovered/model screenshots. It terminates only its owned processes. Use `--consumer /path/to/example-copy` to repeat against an exact public pub.dev dependency. Acceptance activates only in debug builds with explicit `STREAM_ACCEPTANCE_API` and `STREAM_ACCEPTANCE_MODEL` compile-time defines; normal app launches do not run it.
+Requires Flutter on PATH, Xcode and Python 3 on macOS. Pass `--flutter /absolute/path/to/flutter` when needed. The runner starts its own temporary single-node cluster (256 hash slots) and fragmented SSE fixture. It compiles and runs the real Flutter screen controller with actual SDK WebSockets, then saves JSON evidence plus partial/completed/recovered/model screenshots. It terminates only its owned processes. Use `--consumer /path/to/example-copy` to repeat against an exact public pub.dev dependency. Acceptance activates only in debug builds with explicit `STREAM_ACCEPTANCE_API` and `STREAM_ACCEPTANCE_MODEL` compile-time defines; normal app launches do not run it.
 
 See [failure plan](../doc/STREAMING_VALIDATION.md). Native iOS runtime verification and web compilation are distinct evidence; do not treat an untested platform as runtime-verified.
