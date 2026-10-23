@@ -13,6 +13,7 @@ import '../models/event_notification.dart';
 import '../models/message.dart';
 import '../models/reconnecting_info.dart';
 import '../models/send_result.dart';
+import '../models/message_setting.dart';
 import '../models/wukong_error.dart';
 import '../utils/json_rpc.dart';
 import '../utils/uuid_generator.dart';
@@ -177,7 +178,8 @@ class WuKongClient {
       'payload': payloadBase64,
       'header': messageHeader,
       if (topic != null) 'topic': topic,
-      if (setting != null) 'setting': setting,
+      if (setting != null)
+        'setting': setting is MessageSetting ? setting.toJson() : setting,
     };
 
     final response = await _sendRequest('send', params);

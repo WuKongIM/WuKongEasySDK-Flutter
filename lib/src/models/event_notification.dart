@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'message.dart';
 
 /// Event Notification Interface
@@ -36,7 +37,7 @@ class EventNotification {
       id: json['id'] as String,
       type: json['type'] as String,
       timestamp: json['timestamp'] as int,
-      data: json['data'],
+      data: _decodeData(json['data']),
     );
   }
 
@@ -54,5 +55,15 @@ class EventNotification {
   @override
   String toString() {
     return 'EventNotification(timestamp: $timestamp, id: [redacted], type: [redacted], data: [redacted])';
+  }
+}
+
+// Some gateways wrap the business object in a JSON string. Preserve plain text.
+dynamic _decodeData(dynamic data) {
+  if (data is! String) return data;
+  try {
+    return jsonDecode(data);
+  } on FormatException {
+    return data;
   }
 }

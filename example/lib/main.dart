@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'stream/stream_demo_view.dart';
 import 'package:flutter/material.dart';
 import 'package:wukong_easy_sdk/wukong_easy_sdk.dart';
 
@@ -13,11 +14,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'WuKongIM Test Example',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-      ),
-      home: const WuKongTestPage(),
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+      home: const ExampleHome(),
     );
   }
 }
@@ -73,8 +71,10 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
     _targetUserIdController.text = 'friendUser';
     _messageJsonController.text = '{"type":1, "content":"Hello!"}';
 
-    _addLog('Example loaded. Enter connection details and click Connect.',
-        LogType.info);
+    _addLog(
+      'Example loaded. Enter connection details and click Connect.',
+      LogType.info,
+    );
   }
 
   void _setupEventListeners() {
@@ -216,15 +216,14 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('WuKongIM SDK Demo',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'WuKongIM SDK Demo',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: false,
-        actions: [
-          _buildConnectionStatusBadge(),
-          const SizedBox(width: 16),
-        ],
+        actions: [_buildConnectionStatusBadge(), const SizedBox(width: 16)],
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -233,15 +232,9 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
             return Row(
               children: [
                 // Left side: Settings and Control
-                Expanded(
-                  flex: 2,
-                  child: _buildLeftPanel(),
-                ),
+                Expanded(flex: 2, child: _buildLeftPanel()),
                 // Right side: Logs
-                Expanded(
-                  flex: 3,
-                  child: _buildRightPanel(),
-                ),
+                Expanded(flex: 3, child: _buildRightPanel()),
               ],
             );
           } else {
@@ -249,14 +242,10 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
             return Column(
               children: [
                 Expanded(
-                  child: SingleChildScrollView(
-                    child: _buildLeftPanel(),
-                  ),
+                  child: SingleChildScrollView(child: _buildLeftPanel()),
                 ),
                 const Divider(height: 1),
-                Expanded(
-                  child: _buildRightPanel(),
-                ),
+                Expanded(child: _buildRightPanel()),
               ],
             );
           }
@@ -312,20 +301,25 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
                   children: [
                     Expanded(
                       child: FilledButton.icon(
-                        onPressed:
-                            _isConnected || _isConnecting ? null : _connect,
+                        onPressed: _isConnected || _isConnecting
+                            ? null
+                            : _connect,
                         icon: _isConnecting
                             ? const SizedBox(
                                 width: 18,
                                 height: 18,
                                 child: CircularProgressIndicator(
-                                    strokeWidth: 2, color: Colors.white))
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
                             : const Icon(Icons.login),
                         label: const Text('Connect'),
                         style: FilledButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                       ),
                     ),
@@ -338,11 +332,14 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           side: BorderSide(
-                              color: _isConnected ? Colors.red : Colors.grey),
-                          foregroundColor:
-                              _isConnected ? Colors.red : Colors.grey,
+                            color: _isConnected ? Colors.red : Colors.grey,
+                          ),
+                          foregroundColor: _isConnected
+                              ? Colors.red
+                              : Colors.grey,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                       ),
                     ),
@@ -384,7 +381,8 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       backgroundColor: Colors.blue[700],
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
                 ),
@@ -427,7 +425,9 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
                         child: Text(
                           'Console Logs',
                           style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -504,8 +504,11 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
     );
   }
 
-  Widget _buildSectionCard(
-      {required String title, required IconData icon, required Widget child}) {
+  Widget _buildSectionCard({
+    required String title,
+    required IconData icon,
+    required Widget child,
+  }) {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -526,7 +529,9 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
                   child: Text(
                     title,
                     style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -568,8 +573,10 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
           decoration: InputDecoration(
             hintText: hint,
             prefixIcon: Icon(icon, size: 18),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 12,
+            ),
             filled: true,
             fillColor: enabled ? Colors.white : Colors.grey[50],
             border: OutlineInputBorder(
@@ -653,10 +660,7 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
                 const SizedBox(height: 4),
                 Text(
                   entry.message,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontFamily: 'monospace',
-                  ),
+                  style: const TextStyle(fontSize: 13, fontFamily: 'monospace'),
                 ),
               ],
             ),
@@ -665,4 +669,31 @@ class _WuKongTestPageState extends State<WuKongTestPage> {
       ),
     );
   }
+}
+
+class ExampleHome extends StatefulWidget {
+  const ExampleHome({super.key});
+  @override
+  State<ExampleHome> createState() => _ExampleHomeState();
+}
+
+class _ExampleHomeState extends State<ExampleHome> {
+  int index = 1;
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    body: IndexedStack(
+      index: index,
+      children: const [WuKongTestPage(), StreamDemoView()],
+    ),
+    bottomNavigationBar: NavigationBar(
+      selectedIndex: index,
+      onDestinationSelected: (value) => setState(() {
+        index = value;
+      }),
+      destinations: const [
+        NavigationDestination(icon: Icon(Icons.cable), label: '基础通信'),
+        NavigationDestination(icon: Icon(Icons.auto_awesome), label: '流消息'),
+      ],
+    ),
+  );
 }

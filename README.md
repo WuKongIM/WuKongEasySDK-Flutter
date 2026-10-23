@@ -30,7 +30,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  wukong_easy_sdk: ^1.1.0
+  wukong_easy_sdk: ^1.2.0
 ```
 
 Then run:
@@ -662,3 +662,7 @@ See [CHANGELOG.md](CHANGELOG.md) for a detailed list of changes and version hist
 ---
 
 Made with ❤️ by the WuKongIM team
+
+## Streaming messages / 流消息
+
+Version 1.2.0 adds independent peers, typed stream settings and a native streaming chat demo with compatible model SSE, cancellation and reconnect recovery. See the [streaming guide](example/STREAMING.md). Existing `getInstance()` and individual `send` arguments remain supported.

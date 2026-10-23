@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-23
+
+### Added
+- Independent SDK peers with `createInstance()`, typed `SendOptions` and `MessageSetting(stream: true)`, and stream parent settings on received messages.
+- Native Flutter streaming demo with progressive text, compatible model SSE, cancellation, failure and full-history reconnect recovery, plus repeatable acceptance and screenshots.
+
+### Fixed
+- Decode JSON-string EVENT data and accept SENDACK `reason` as well as `reasonCode`; legacy successful acknowledgements default to reason 1.
+
 ## [1.1.0] - 2026-08-31
 
 ### Added

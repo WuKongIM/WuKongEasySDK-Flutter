@@ -12,6 +12,8 @@ export 'src/models/connect_result.dart';
 export 'src/models/disconnect_info.dart';
 export 'src/models/event_notification.dart';
 export 'src/models/message.dart';
+export 'src/models/message_setting.dart';
+export 'src/models/send_options.dart';
 export 'src/models/message_payload.dart';
 export 'src/models/reconnecting_info.dart';
 export 'src/models/send_result.dart';

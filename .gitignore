@@ -219,7 +219,10 @@ example/ios/Runner.xcworkspace/xcuserdata/
 example/android/.gradle/
 example/android/app/build/
 example/android/build/
-example/android/gradle/
+example/android/gradle/*
+!example/android/gradle/wrapper/
+example/android/gradle/wrapper/*
+!example/android/gradle/wrapper/gradle-wrapper.properties
 example/android/gradlew
 example/android/gradlew.bat
 example/android/local.properties
@@ -239,3 +242,8 @@ melos_*.yaml
 
 # Very Good CLI
 .vgv/
+
+# Local development and validation artifacts
+.worktrees/
+tmp/
+**/__pycache__/
