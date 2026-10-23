@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-10-23
+
+### Fixed
+- Resolve the native acceptance runner's Flutter executable from PATH or `--flutter`, instead of a developer-specific installation path. Streaming SDK APIs and demo behavior are unchanged from 1.2.0.
+
 ## [1.2.0] - 2026-10-23
 
 ### Added

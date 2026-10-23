@@ -4,6 +4,7 @@ import argparse
 import http.server
 import json
 import os
+import shutil
 from pathlib import Path
 import socket
 import subprocess
@@ -24,9 +25,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--server-bin', required=True, type=Path)
     parser.add_argument('--simulator', required=True)
+    parser.add_argument('--flutter', default='flutter', help='Flutter executable on PATH, or an absolute path')
     parser.add_argument('--consumer', type=Path, help='Example copy resolving the exact public package')
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
+    flutter = shutil.which(args.flutter)
+    if flutter is None: parser.error('Flutter executable not found; pass --flutter /path/to/flutter')
     repo = Path(__file__).resolve().parents[2]
     output = args.output or Path(tempfile.mkdtemp(prefix='wk-flutter-stream-'))
     output.mkdir(parents=True, exist_ok=True)
@@ -165,8 +169,8 @@ dir = "{output}/logs"
                     raise RuntimeError('Temporary cluster did not become ready; inspect server.log')
                 time.sleep(0.1)
         app_log = (output / 'flutter-run.log').open('w')
-        flutter_env = dict(os.environ, PATH='/Users/tt/flutter/flutter/bin:/opt/homebrew/opt/openjdk@17/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin')
-        app_process = subprocess.Popen(['flutter', 'run', '--debug', '-d', args.simulator,
+        flutter_env = dict(os.environ)
+        app_process = subprocess.Popen([flutter, 'run', '--debug', '-d', args.simulator,
             '--dart-define=STREAM_ACCEPTANCE_API=http://127.0.0.1:' + str(proxy_port),
             '--dart-define=STREAM_ACCEPTANCE_MODEL=http://127.0.0.1:' + str(model_port)],
             cwd=example, env=flutter_env, stdout=app_log, stderr=subprocess.STDOUT, stdin=subprocess.PIPE)
@@ -189,7 +193,7 @@ dir = "{output}/logs"
         report['environment']['sdk_worktree_dirty'] = bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=repo, text=True).strip())
         report['environment']['simulator'] = args.simulator
         report['environment']['dependency_origin'] = 'pub.dev exact consumer' if args.consumer else 'source path'
-        version = subprocess.check_output(['flutter', '--version', '--machine'], cwd=example, env=flutter_env, text=True)
+        version = subprocess.check_output([flutter, '--version', '--machine'], cwd=example, env=flutter_env, text=True)
         report['environment']['flutter_version'] = json.loads(version)['frameworkVersion']
         deadline = time.monotonic() + 3
         while metrics['cancelled'] < 1 and time.monotonic() < deadline:
