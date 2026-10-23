@@ -239,3 +239,8 @@ melos_*.yaml
 
 # Very Good CLI
 .vgv/
+
+# Local development and validation artifacts
+.worktrees/
+tmp/
+**/__pycache__/

@@ -1,4 +1,5 @@
 import '../enums/wukong_channel_type.dart';
+import 'message_setting.dart';
 
 /// Header information for messages
 class MessageHeader {
@@ -86,6 +87,9 @@ class Message {
   /// Optional topic
   final String? topic;
 
+  /// Stream parent flag carried by RECV; absent for legacy messages.
+  final MessageSetting? setting;
+
   /// Creates a new message
   const Message({
     required this.header,
@@ -101,6 +105,7 @@ class Message {
     this.streamId,
     this.streamFlag,
     this.topic,
+    this.setting,
   });
 
   /// Creates a Message from JSON
@@ -119,6 +124,9 @@ class Message {
       streamId: json['streamId'] as String?,
       streamFlag: json['streamFlag'] as int?,
       topic: json['topic'] as String?,
+      setting: json['setting'] is Map<String, dynamic>
+          ? MessageSetting.fromJson(json['setting'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -138,6 +146,7 @@ class Message {
       if (streamId != null) 'streamId': streamId,
       if (streamFlag != null) 'streamFlag': streamFlag,
       if (topic != null) 'topic': topic,
+      if (setting != null) 'setting': setting!.toJson(),
     };
   }
 

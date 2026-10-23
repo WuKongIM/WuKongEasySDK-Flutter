@@ -25,7 +25,8 @@ class SendResult {
     return SendResult(
       messageId: json['messageId'] as String,
       messageSeq: json['messageSeq'] as int,
-      reasonCode: WuKongReasonCode(json['reasonCode'] as int? ?? 0),
+      reasonCode:
+          WuKongReasonCode((json['reasonCode'] ?? json['reason']) as int? ?? 1),
     );
   }
 

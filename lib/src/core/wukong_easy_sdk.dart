@@ -2,6 +2,8 @@ import '../enums/wukong_event.dart';
 import '../enums/wukong_channel_type.dart';
 import '../exceptions/wukong_exceptions.dart';
 import '../models/send_result.dart';
+import '../models/send_options.dart';
+import '../models/message_setting.dart';
 import '../utils/event_listener.dart';
 import '../utils/wukong_logger.dart';
 import 'event_manager.dart';
@@ -40,6 +42,9 @@ class WuKongEasySDK {
     _instance ??= WuKongEasySDK._();
     return _instance!;
   }
+
+  /// Creates an independent peer with its own connection and event listeners.
+  static WuKongEasySDK createInstance() => WuKongEasySDK._();
 
   /// Initializes the SDK with the provided configuration
   ///
@@ -118,7 +123,8 @@ class WuKongEasySDK {
   /// [clientMsgNo] Optional client message number (auto-generated if not provided)
   /// [header] Optional message header
   /// [topic] Optional topic for the message
-  /// [setting] Optional message settings
+  /// [setting] Optional legacy settings map or [MessageSetting]
+  /// [options] Typed send options; non-null fields override individual arguments
   ///
   /// Returns a Future that completes with the send result
   ///
@@ -133,6 +139,7 @@ class WuKongEasySDK {
     Map<String, dynamic>? header,
     String? topic,
     dynamic setting,
+    SendOptions? options,
   }) async {
     if (!_isInitialized || _client == null) {
       throw const WuKongConfigurationException(
@@ -150,10 +157,10 @@ class WuKongEasySDK {
         channelId: channelId,
         channelType: channelType,
         payload: payload,
-        clientMsgNo: clientMsgNo,
-        header: header,
-        topic: topic,
-        setting: setting,
+        clientMsgNo: options?.clientMsgNo ?? clientMsgNo,
+        header: options?.header ?? header,
+        topic: options?.topic ?? topic,
+        setting: options?.setting ?? setting,
       );
 
       _logger.log('Message sent successfully');
